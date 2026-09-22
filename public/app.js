@@ -1,16 +1,8 @@
-// ==========================================================================
-// OPIUM ARCHIVE STORE — ОСНОВНОЙ СКРИПТ (Vanilla JS)
-// Реализация всех 6 этапов ТЗ в легком и понятном виде
-// ==========================================================================
-
 let currentUser = null;
 let allProducts = [];
 let userWishlist = [];
 let currentCategory = 'Все';
 
-// -------------------------------------------------------------
-// ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ СТРАНИЦЫ
-// -------------------------------------------------------------
 document.addEventListener('DOMContentLoaded', async () => {
   await checkAuth();
   await loadProducts();
@@ -18,7 +10,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupMinDeliveryDate();
 });
 
-// Проверка текущей сессии пользователя
 async function checkAuth() {
   try {
     const res = await fetch('/api/auth/me');
@@ -29,31 +20,23 @@ async function checkAuth() {
       await loadWishlist();
     }
   } catch (err) {
-    console.error('Ошибка проверки авторизации:', err);
+    console.error(err);
   }
 }
 
-// Обновление кнопок в шапке
 function updateNavAuth() {
   const profileText = document.getElementById('navProfileText');
   const adminBtn = document.getElementById('navAdminBtn');
 
   if (currentUser) {
     profileText.textContent = currentUser.full_name.split(' ')[0] || currentUser.login;
-    if (currentUser.role === 'admin') {
-      adminBtn.style.display = 'inline-flex';
-    } else {
-      adminBtn.style.display = 'none';
-    }
+    adminBtn.style.display = currentUser.role === 'admin' ? 'inline-flex' : 'none';
   } else {
     profileText.textContent = 'Войти';
     adminBtn.style.display = 'none';
   }
 }
 
-// -------------------------------------------------------------
-// НАВИГАЦИЯ МЕЖДУ СЕКЦИЯМИ (SPA)
-// -------------------------------------------------------------
 function navigateTo(sectionName) {
   document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
@@ -80,7 +63,7 @@ function navigateTo(sectionName) {
     loadProfile();
   } else if (sectionName === 'admin') {
     if (!currentUser || currentUser.role !== 'admin') {
-      showToast('Доступ в панель администратора только для lab16');
+      showToast('Доступ только для администратора');
       return;
     }
     document.getElementById('adminView').classList.add('active');
@@ -98,9 +81,6 @@ function openProfileOrAuth() {
   }
 }
 
-// -------------------------------------------------------------
-// ЭТАП 4 & 6. ЗАГРУЗКА И ОТОБРАЖЕНИЕ КАТАЛОГА
-// -------------------------------------------------------------
 async function loadProducts() {
   try {
     const res = await fetch('/api/products');
@@ -108,14 +88,14 @@ async function loadProducts() {
     allProducts = data.products || [];
     renderProducts();
   } catch (err) {
-    console.error('Ошибка загрузки каталога:', err);
+    console.error(err);
   }
 }
 
 function filterCategory(cat) {
   currentCategory = cat;
   document.querySelectorAll('.cat-chip').forEach(chip => {
-    if (chip.textContent.includes(cat) || (cat === 'Все' && chip.textContent.includes('Все'))) {
+    if (chip.textContent.trim() === cat) {
       chip.classList.add('active');
     } else {
       chip.classList.remove('active');
@@ -133,12 +113,11 @@ function renderProducts() {
     : allProducts.filter(p => p.category === currentCategory);
 
   if (filtered.length === 0) {
-    grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding: 40px; color: var(--text-dim);">В этой категории товаров пока нет.</div>';
+    grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding: 40px; color: var(--text-dim);">Товары не найдены</div>';
     return;
   }
 
   filtered.forEach(p => {
-    // По ТЗ: если картинка не загружена, берем заглушку no_image.jpg
     const imgSrc = p.image ? `/uploads/${p.image}` : '/no_image.jpg';
     const isWished = userWishlist.includes(p.id);
 
@@ -147,21 +126,21 @@ function renderProducts() {
     card.innerHTML = `
       <div class="card-media-wrap" onclick="openProductModal(${p.id})">
         <img src="${imgSrc}" alt="${p.title}" class="card-img" onerror="this.src='/no_image.jpg'">
-        <span class="stock-tag">В наличии: ${p.stock} шт.</span>
+        <span class="stock-tag">В наличии: ${p.stock}</span>
         <button class="wish-btn ${isWished ? 'active' : ''}" onclick="toggleWish(event, ${p.id})">
-          ${isWished ? '♥' : '♡'}
+          ${isWished ? '✕' : '+'}
         </button>
       </div>
       <div class="card-body">
         <span class="card-category">${p.category || 'Архив'}</span>
         <h3 class="card-title" onclick="openProductModal(${p.id})">${p.title}</h3>
         <div class="card-rating">
-          ★ ${p.avg_rating || '5.0'} <span>(${p.reviews_count || 0} отзывов)</span>
+          Рейтинг: ${p.avg_rating || '5.0'} (${p.reviews_count || 0})
         </div>
         <div class="card-bottom">
           <span class="card-price">${Number(p.price).toLocaleString('ru-RU')} ₽</span>
-          <button class="btn btn-primary btn-sm" onclick="addToCart(${p.id})" ${p.stock <= 0 ? 'disabled' : ''}>
-            ${p.stock > 0 ? '+ В корзину' : 'Нет на складе'}
+          <button class="btn btn-secondary btn-sm" onclick="addToCart(${p.id})" ${p.stock <= 0 ? 'disabled' : ''}>
+            ${p.stock > 0 ? 'В корзину' : 'Нет в наличии'}
           </button>
         </div>
       </div>
@@ -170,9 +149,6 @@ function renderProducts() {
   });
 }
 
-// -------------------------------------------------------------
-// ЭТАП 3. ДЕТАЛИ ТОВАРА И СТРОГАЯ СИСТЕМА ОТЗЫВОВ
-// -------------------------------------------------------------
 async function openProductModal(productId) {
   try {
     const res = await fetch(`/api/products/${productId}`);
@@ -189,7 +165,7 @@ async function openProductModal(productId) {
         <div class="review-meta">
           <span class="review-user">${r.user_name}</span>
           <div>
-            <span class="review-rating">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</span>
+            <span>Оценка: ${r.rating}/5</span>
             <span style="margin-left: 8px;">${r.created_at}</span>
           </div>
         </div>
@@ -198,38 +174,37 @@ async function openProductModal(productId) {
     `).join('');
 
     if (reviews.length === 0) {
-      reviewsHtml = '<p style="color: var(--text-dim); font-size: 13px;">Отзывов на этот товар пока нет. Будьте первым!</p>';
+      reviewsHtml = '<p style="color: var(--text-dim); font-size: 13px;">Отзывов пока нет</p>';
     }
 
-    // Форма отзыва строго для покупателей с завершенным заказом (Этап 3)
     let reviewFormHtml = '';
     if (canReview) {
       reviewFormHtml = `
         <div class="review-form-box">
-          <h4 style="font-size: 14px; margin-bottom: 8px; color: #ffffff;">Оставить отзыв на товар</h4>
+          <h4 style="font-size: 13px; margin-bottom: 8px;">Оставить отзыв</h4>
           <form onsubmit="submitReview(event, ${p.id})">
             <div class="form-group">
-              <label>Ваша оценка:</label>
-              <select id="reviewRating" style="width: 140px;">
-                <option value="5">★★★★★ (5)</option>
-                <option value="4">★★★★☆ (4)</option>
-                <option value="3">★★★☆☆ (3)</option>
-                <option value="2">★★☆☆☆ (2)</option>
-                <option value="1">★☆☆☆☆ (1)</option>
+              <label>Оценка</label>
+              <select id="reviewRating" style="width: 100px;">
+                <option value="5">5 / 5</option>
+                <option value="4">4 / 5</option>
+                <option value="3">3 / 5</option>
+                <option value="2">2 / 5</option>
+                <option value="1">1 / 5</option>
               </select>
             </div>
             <div class="form-group">
-              <label>Ваш комментарий:</label>
-              <textarea id="reviewComment" rows="2" placeholder="Опишите качество ткани, посадку и детали вещи..." required></textarea>
+              <label>Комментарий</label>
+              <textarea id="reviewComment" rows="2" required></textarea>
             </div>
-            <button type="submit" class="btn btn-primary btn-sm">Отправить отзыв</button>
+            <button type="submit" class="btn btn-primary btn-sm">Отправить</button>
           </form>
         </div>
       `;
     } else {
       reviewFormHtml = `
         <div class="review-restricted-notice">
-          🔒 <strong>По ТЗ (Этап 3):</strong> Оставить отзыв могут исключительно покупатели, у которых данный товар есть в заказе со статусом «Завершено».
+          Оставить отзыв могут только покупатели с завершенным заказом на данный товар.
         </div>
       `;
     }
@@ -241,11 +216,11 @@ async function openProductModal(productId) {
         </div>
         <div class="detail-info">
           <span class="card-category">${p.category || 'Архив'}</span>
-          <h2 style="font-size: 22px; margin-bottom: 8px;">${p.title}</h2>
-          <div class="card-rating">★ ${p.avg_rating || '5.0'} (${reviews.length} отзывов)</div>
-          <p class="detail-desc">${p.description || 'Эксклюзивная архивная позиция в стилистике Opium / Kai Angel.'}</p>
+          <h2 style="font-size: 20px; margin-bottom: 8px;">${p.title}</h2>
+          <div class="card-rating">Рейтинг: ${p.avg_rating || '5.0'} (${reviews.length} отзывов)</div>
+          <p class="detail-desc">${p.description || ''}</p>
           <div class="detail-price">${Number(p.price).toLocaleString('ru-RU')} ₽</div>
-          <p class="field-hint" style="margin-bottom: 15px;">Остаток на складе: <strong>${p.stock} шт.</strong></p>
+          <p class="field-hint" style="margin-bottom: 15px;">Остаток: ${p.stock} шт.</p>
           <button class="btn btn-primary" onclick="addToCart(${p.id})" ${p.stock <= 0 ? 'disabled' : ''}>
             ${p.stock > 0 ? 'Добавить в корзину' : 'Нет в наличии'}
           </button>
@@ -254,8 +229,8 @@ async function openProductModal(productId) {
 
       <div class="reviews-section">
         <div class="reviews-header">
-          <h3>Отзывы покупателей</h3>
-          <span class="strict-badge">Строгая модерация ТЗ</span>
+          <h3>Отзывы</h3>
+          <span class="strict-badge">Проверенные покупки</span>
         </div>
         <div class="reviews-list">${reviewsHtml}</div>
         ${reviewFormHtml}
@@ -264,7 +239,7 @@ async function openProductModal(productId) {
 
     document.getElementById('productModal').classList.add('active');
   } catch (err) {
-    console.error('Ошибка загрузки товара:', err);
+    console.error(err);
   }
 }
 
@@ -285,27 +260,24 @@ async function submitReview(event, productId) {
     });
     const data = await res.json();
     if (res.ok) {
-      showToast('Ваш отзыв успешно опубликован!');
+      showToast('Отзыв опубликован');
       await loadProducts();
       openProductModal(productId);
     } else {
-      showToast(data.error || 'Ошибка при отправке отзыва');
+      showToast(data.error || 'Ошибка при отправке');
     }
   } catch (err) {
     console.error(err);
   }
 }
 
-// -------------------------------------------------------------
-// ЭТАП 2. КОРЗИНА И ОФОРМЛЕНИЕ ЗАКАЗА (CHECKOUT)
-// -------------------------------------------------------------
 async function loadCart() {
   try {
     const res = await fetch('/api/cart');
     const data = await res.json();
     renderCart(data);
   } catch (err) {
-    console.error('Ошибка загрузки корзины:', err);
+    console.error(err);
   }
 }
 
@@ -317,7 +289,7 @@ function renderCart(cartData) {
   container.innerHTML = '';
 
   if (!cartData.items || cartData.items.length === 0) {
-    container.innerHTML = '<div style="text-align: center; color: var(--text-dim); padding: 40px 10px;">Ваша корзина пуста. Добавьте архивные вещи из каталога.</div>';
+    container.innerHTML = '<div style="text-align: center; color: var(--text-dim); padding: 40px 10px;">Корзина пуста</div>';
     document.getElementById('checkoutBtn').disabled = true;
   } else {
     document.getElementById('checkoutBtn').disabled = false;
@@ -336,13 +308,12 @@ function renderCart(cartData) {
           <span class="qty-val">${it.quantity}</span>
           <button class="qty-btn" onclick="updateQty(${it.productId}, ${it.quantity + 1})">+</button>
         </div>
-        <button class="del-btn" onclick="removeFromCart(${it.productId})" title="Удалить">✕</button>
+        <button class="del-btn" onclick="removeFromCart(${it.productId})">✕</button>
       `;
       container.appendChild(itemEl);
     });
   }
 
-  // Расчет итогов и промокода
   document.getElementById('cartSubtotal').textContent = `${cartData.subtotal.toLocaleString('ru-RU')} ₽`;
 
   const discountRow = document.getElementById('discountRow');
@@ -366,12 +337,8 @@ async function addToCart(productId, qty = 1) {
     });
     const data = await res.json();
     if (res.ok) {
-      showToast('⚡ Товар добавлен в корзину');
+      showToast('Добавлено в корзину');
       await loadCart();
-      // Микроанимация кнопки корзины
-      const trigger = document.getElementById('cartTrigger');
-      trigger.style.transform = 'scale(1.1)';
-      setTimeout(() => trigger.style.transform = 'scale(1)', 200);
     } else {
       showToast(data.error || 'Ошибка добавления');
     }
@@ -391,7 +358,7 @@ async function updateQty(productId, newQty) {
     if (res.ok) {
       await loadCart();
     } else {
-      showToast(data.error || 'Не удалось обновить количество');
+      showToast(data.error || 'Не удалось обновить');
     }
   } catch (err) {
     console.error(err);
@@ -420,7 +387,6 @@ async function clearCart() {
   }
 }
 
-// Применение скидочного промокода (Этап 6)
 async function applyPromo() {
   const code = document.getElementById('promoInput').value.trim();
   const notice = document.getElementById('promoNotice');
@@ -434,11 +400,11 @@ async function applyPromo() {
     });
     const data = await res.json();
     if (res.ok) {
-      notice.style.color = 'var(--success-emerald)';
+      notice.style.color = 'var(--success)';
       notice.textContent = data.message;
       await loadCart();
     } else {
-      notice.style.color = 'var(--danger-crimson)';
+      notice.style.color = 'var(--danger)';
       notice.textContent = data.error;
     }
   } catch (err) {
@@ -454,11 +420,10 @@ function closeCart() {
   document.getElementById('cartDrawer').classList.remove('active');
 }
 
-// Оформление заказа (Checkout)
 function openCheckout() {
   if (!currentUser) {
     closeCart();
-    showToast('Для оформления заказа необходимо войти в аккаунт');
+    showToast('Требуется авторизация');
     openAuthModal('login');
     return;
   }
@@ -503,23 +468,18 @@ async function submitCheckout(event) {
 
     if (res.ok) {
       closeCheckout();
-      showToast(`Заказ №${data.orderId} оформлен со статусом «Новый»!`);
+      showToast(`Заказ №${data.orderId} оформлен`);
       await loadCart();
       await loadProducts();
       navigateTo('profile');
     } else {
-      showToast(data.error || 'Ошибка при оформлении заказа');
+      showToast(data.error || 'Ошибка при оформлении');
     }
   } catch (err) {
     console.error(err);
   }
 }
 
-// -------------------------------------------------------------
-// ЭТАП 1. РЕГИСТРАЦИЯ, ВАЛИДАЦИЯ В РЕАЛЬНОМ ВРЕМЕНИ И ВХОД
-// -------------------------------------------------------------
-
-// Правила валидации для клиентской подсветки
 const validationRules = {
   login: {
     regex: /^[a-zA-Z0-9]{6,}$/,
@@ -539,11 +499,10 @@ const validationRules = {
   },
   email: {
     regex: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-    msg: 'Корректный email (например, user@mail.ru)'
+    msg: 'Корректный email'
   }
 };
 
-// Подсветка ошибок в реальном времени при вводе
 function validateField(fieldName) {
   let input, errorEl, isValid = false;
 
@@ -585,7 +544,6 @@ function validateField(fieldName) {
   return isValid;
 }
 
-// Отправка формы регистрации
 async function submitRegister(event) {
   event.preventDefault();
 
@@ -596,7 +554,7 @@ async function submitRegister(event) {
   const v5 = validateField('email');
 
   if (!v1 || !v2 || !v3 || !v4 || !v5) {
-    showToast('Пожалуйста, исправьте ошибки в форме');
+    showToast('Исправьте ошибки в форме');
     return;
   }
 
@@ -624,14 +582,14 @@ async function submitRegister(event) {
       currentUser = data.user;
       updateNavAuth();
       closeAuthModal();
-      showToast(`Добро пожаловать в Opium Archive, ${currentUser.login}!`);
+      showToast(`Регистрация успешна: ${currentUser.login}`);
     } else {
       errBox.style.display = 'block';
       if (data.errors) {
         const msgs = Object.values(data.errors).map(e => e.msg).join('<br>');
         errBox.innerHTML = msgs;
       } else {
-        errBox.textContent = data.error || 'Ошибка при регистрации';
+        errBox.textContent = data.error || 'Ошибка регистрации';
       }
     }
   } catch (err) {
@@ -639,7 +597,6 @@ async function submitRegister(event) {
   }
 }
 
-// Отправка формы входа (Login)
 async function submitLogin(event) {
   event.preventDefault();
 
@@ -662,20 +619,19 @@ async function submitLogin(event) {
       updateNavAuth();
       closeAuthModal();
       await loadWishlist();
-      showToast(`Успешный вход: @${currentUser.login}`);
+      showToast(`Вы вошли как ${currentUser.login}`);
       if (currentUser.role === 'admin') {
         navigateTo('admin');
       }
     } else {
       errBox.style.display = 'block';
-      errBox.textContent = data.error || 'Неверные данные входа';
+      errBox.textContent = data.error || 'Неверный логин или пароль';
     }
   } catch (err) {
     console.error(err);
   }
 }
 
-// Выход из аккаунта
 async function logout() {
   try {
     await fetch('/api/auth/logout', { method: 'POST' });
@@ -689,24 +645,11 @@ async function logout() {
   }
 }
 
-// Переключение табов входа и регистрации (по ТЗ: ссылка «Еще не зарегистрированы?»)
 function switchAuthTab(tab) {
-  const tabLogin = document.getElementById('authTabLogin');
-  const tabRegister = document.getElementById('authTabRegister');
-  const formLogin = document.getElementById('loginFormContainer');
-  const formRegister = document.getElementById('registerFormContainer');
-
-  if (tab === 'login') {
-    tabLogin.classList.add('active');
-    tabRegister.classList.remove('active');
-    formLogin.classList.add('active');
-    formRegister.classList.remove('active');
-  } else {
-    tabLogin.classList.remove('active');
-    tabRegister.classList.add('active');
-    formLogin.classList.remove('active');
-    formRegister.classList.add('active');
-  }
+  document.getElementById('authTabLogin').classList.toggle('active', tab === 'login');
+  document.getElementById('authTabRegister').classList.toggle('active', tab === 'register');
+  document.getElementById('loginFormContainer').classList.toggle('active', tab === 'login');
+  document.getElementById('registerFormContainer').classList.toggle('active', tab === 'register');
 }
 
 function openAuthModal(defaultTab = 'login') {
@@ -718,24 +661,20 @@ function closeAuthModal() {
   document.getElementById('authModal').classList.remove('active');
 }
 
-// Быстрое заполнение админки lab16 / prac3 по ТЗ
 function quickFillAdmin() {
   document.getElementById('loginUsername').value = 'lab16';
   document.getElementById('loginPassword').value = 'prac3';
-  showToast('Данные администратора lab16 / prac3 подставлены');
 }
 
-// -------------------------------------------------------------
-// ЭТАП 3. ЛИЧНЫЙ КАБИНЕТ И ИСТОРИЯ ЗАКАЗОВ
-// -------------------------------------------------------------
 async function loadProfile() {
   if (!currentUser) return;
 
+  document.getElementById('profileInitials').textContent = (currentUser.login || 'US').slice(0, 2).toUpperCase();
   document.getElementById('profileFullName').textContent = currentUser.full_name;
   document.getElementById('profileLogin').textContent = `@${currentUser.login}`;
   document.getElementById('profilePhone').textContent = currentUser.phone;
   document.getElementById('profileEmail').textContent = currentUser.email;
-  document.getElementById('profileRole').textContent = currentUser.role === 'admin' ? 'Администратор ⚡' : 'Покупатель';
+  document.getElementById('profileRole').textContent = currentUser.role === 'admin' ? 'Администратор' : 'Пользователь';
 
   try {
     const res = await fetch('/api/orders/my');
@@ -744,7 +683,7 @@ async function loadProfile() {
     list.innerHTML = '';
 
     if (!data.orders || data.orders.length === 0) {
-      list.innerHTML = '<p style="color: var(--text-dim);">У вас пока нет оформленных заказов.</p>';
+      list.innerHTML = '<p style="color: var(--text-dim);">У вас пока нет заказов.</p>';
       return;
     }
 
@@ -764,25 +703,22 @@ async function loadProfile() {
           <span class="order-id">Заказ #${o.id}</span>
           <span class="order-status ${statusClass}">${o.status}</span>
         </div>
-        <div style="font-size: 12px; color: var(--text-dim); margin-bottom: 8px;">
-          Дата заказа: ${o.created_at} • Доставка: ${o.delivery_method} (${o.delivery_date}) • Оплата: ${o.payment_method}
+        <div style="font-size: 11px; color: var(--text-dim); margin-bottom: 8px;">
+          ${o.created_at} • ${o.delivery_method} (${o.delivery_date}) • ${o.payment_method}
         </div>
         <ul class="order-items-list">${itemsStr}</ul>
         <div class="order-footer">
-          <span>${o.promo_code ? `Промокод: <strong>${o.promo_code}</strong>` : 'Без скидки'}</span>
-          <span>Итого: <strong>${o.total_price.toLocaleString('ru-RU')} ₽</strong></span>
+          <span>${o.promo_code ? `Промокод: ${o.promo_code}` : 'Без скидки'}</span>
+          <span>Итого: ${o.total_price.toLocaleString('ru-RU')} ₽</span>
         </div>
       `;
       list.appendChild(box);
     });
   } catch (err) {
-    console.error('Ошибка загрузки профиля:', err);
+    console.error(err);
   }
 }
 
-// -------------------------------------------------------------
-// ЭТАП 5. ПАНЕЛЬ АДМИНИСТРАТОРА (lab16 / prac3)
-// -------------------------------------------------------------
 function switchAdminTab(tab) {
   document.getElementById('tabOrdersBtn').classList.toggle('active', tab === 'orders');
   document.getElementById('tabAddProductBtn').classList.toggle('active', tab === 'add-product');
@@ -801,7 +737,7 @@ async function loadAdminOrders() {
     container.innerHTML = '';
 
     if (!data.orders || data.orders.length === 0) {
-      container.innerHTML = '<p style="color: var(--text-dim); padding: 20px;">Заказов с таким статусом не найдено.</p>';
+      container.innerHTML = '<p style="color: var(--text-dim); padding: 20px;">Заказы не найдены</p>';
       return;
     }
 
@@ -822,15 +758,15 @@ async function loadAdminOrders() {
           </div>
           <span class="order-status ${statusClass}">${o.status}</span>
         </div>
-        <div style="font-size: 13px; color: var(--text-muted);">
-          <strong>Состав:</strong> ${itemsStr}
+        <div style="font-size: 12px; color: var(--text-muted);">
+          Состав: ${itemsStr}
         </div>
-        <div style="font-size: 12px; color: var(--text-dim);">
+        <div style="font-size: 11px; color: var(--text-dim);">
           Доставка: ${o.delivery_method} • Дата: ${o.delivery_date} • Оплата: ${o.payment_method} • Сумма: ${o.total_price} ₽
         </div>
-        <div style="display: flex; align-items: center; gap: 10px; margin-top: 6px;">
-          <label style="font-size: 12px;">Изменить статус:</label>
-          <select style="width: 150px; padding: 4px 8px; font-size: 12px;" onchange="updateSingleOrderStatus(${o.id}, this.value)">
+        <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
+          <label style="font-size: 11px;">Статус:</label>
+          <select style="width: 130px; padding: 3px 6px; font-size: 11px;" onchange="updateSingleOrderStatus(${o.id}, this.value)">
             <option value="Новый" ${o.status === 'Новый' ? 'selected' : ''}>Новый</option>
             <option value="В обработке" ${o.status === 'В обработке' ? 'selected' : ''}>В обработке</option>
             <option value="Завершено" ${o.status === 'Завершено' ? 'selected' : ''}>Завершено</option>
@@ -852,7 +788,7 @@ async function updateSingleOrderStatus(orderId, newStatus) {
       body: JSON.stringify({ status: newStatus })
     });
     if (res.ok) {
-      showToast(`Статус заказа #${orderId} изменен на «${newStatus}»`);
+      showToast(`Статус заказа #${orderId} изменен`);
       loadAdminOrders();
     }
   } catch (err) {
@@ -860,14 +796,13 @@ async function updateSingleOrderStatus(orderId, newStatus) {
   }
 }
 
-// Массовая смена статусов заказов (Этап 5)
 async function applyBatchStatus() {
   const checkboxes = document.querySelectorAll('.order-select-check:checked');
   const orderIds = Array.from(checkboxes).map(cb => parseInt(cb.value));
   const newStatus = document.getElementById('adminBatchStatus').value;
 
   if (orderIds.length === 0) {
-    showToast('Выберите хотя бы один заказ галочкой');
+    showToast('Выберите заказы');
     return;
   }
 
@@ -878,7 +813,7 @@ async function applyBatchStatus() {
       body: JSON.stringify({ orderIds, status: newStatus })
     });
     if (res.ok) {
-      showToast(`Статус обновлен для ${orderIds.length} заказов на «${newStatus}»`);
+      showToast(`Статус обновлен для ${orderIds.length} заказов`);
       loadAdminOrders();
     }
   } catch (err) {
@@ -886,7 +821,6 @@ async function applyBatchStatus() {
   }
 }
 
-// Добавление нового товара администратором с загрузкой обложки (Multer)
 async function submitNewProduct(event) {
   event.preventDefault();
   const form = document.getElementById('addProductForm');
@@ -899,22 +833,19 @@ async function submitNewProduct(event) {
     });
     const data = await res.json();
     if (res.ok) {
-      showToast('⚡ Товар успешно опубликован в каталоге!');
+      showToast('Товар сохранен');
       form.reset();
       await loadProducts();
       switchAdminTab('orders');
       navigateTo('catalog');
     } else {
-      showToast(data.error || 'Ошибка при добавлении товара');
+      showToast(data.error || 'Ошибка сохранения');
     }
   } catch (err) {
     console.error(err);
   }
 }
 
-// -------------------------------------------------------------
-// ЭТАП 6. ИЗБРАННОЕ (WISHLIST)
-// -------------------------------------------------------------
 async function loadWishlist() {
   if (!currentUser) {
     userWishlist = [];
@@ -934,7 +865,7 @@ async function loadWishlist() {
 async function toggleWish(event, productId) {
   event.stopPropagation();
   if (!currentUser) {
-    showToast('Войдите, чтобы добавлять вещи в избранное');
+    showToast('Требуется авторизация');
     openAuthModal('login');
     return;
   }
@@ -949,7 +880,7 @@ async function toggleWish(event, productId) {
     if (res.ok) {
       if (data.inWishlist) {
         userWishlist.push(productId);
-        showToast('Добавлено в избранное ♥');
+        showToast('Добавлено в избранное');
       } else {
         userWishlist = userWishlist.filter(id => id !== productId);
         showToast('Удалено из избранного');
@@ -968,7 +899,7 @@ function renderWishlist() {
 
   const wishedItems = allProducts.filter(p => userWishlist.includes(p.id));
   if (wishedItems.length === 0) {
-    grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding: 40px; color: var(--text-dim);">У вас пока нет сохраненных вещей в избранном.</div>';
+    grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding: 40px; color: var(--text-dim);">Избранное пусто</div>';
     return;
   }
 
@@ -979,14 +910,14 @@ function renderWishlist() {
     card.innerHTML = `
       <div class="card-media-wrap" onclick="openProductModal(${p.id})">
         <img src="${imgSrc}" alt="${p.title}" class="card-img" onerror="this.src='/no_image.jpg'">
-        <button class="wish-btn active" onclick="toggleWish(event, ${p.id})">♥</button>
+        <button class="wish-btn active" onclick="toggleWish(event, ${p.id})">✕</button>
       </div>
       <div class="card-body">
         <span class="card-category">${p.category || 'Архив'}</span>
         <h3 class="card-title" onclick="openProductModal(${p.id})">${p.title}</h3>
         <div class="card-bottom">
           <span class="card-price">${Number(p.price).toLocaleString('ru-RU')} ₽</span>
-          <button class="btn btn-primary btn-sm" onclick="addToCart(${p.id})">+ В корзину</button>
+          <button class="btn btn-secondary btn-sm" onclick="addToCart(${p.id})">В корзину</button>
         </div>
       </div>
     `;
@@ -994,9 +925,6 @@ function renderWishlist() {
   });
 }
 
-// -------------------------------------------------------------
-// ХЕЛПЕРЫ: TOAST И ПРОМОКОДЫ
-// -------------------------------------------------------------
 let toastTimer = null;
 function showToast(message) {
   const toast = document.getElementById('toastNotification');
@@ -1006,11 +934,11 @@ function showToast(message) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => {
     toast.style.display = 'none';
-  }, 3200);
+  }, 2500);
 }
 
 function copyCode(code) {
   navigator.clipboard.writeText(code);
-  showToast(`Промокод скопирован: ${code}`);
+  showToast(`Промокод ${code} скопирован`);
   document.getElementById('promoInput').value = code;
 }

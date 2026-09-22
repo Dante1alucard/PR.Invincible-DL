@@ -9,44 +9,39 @@ const { dbRun, dbGet, dbAll, initDatabase } = require('./database');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Гарантируем наличие папки uploads
 const uploadDir = path.join(__dirname, 'public', 'uploads');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// Настройка Multer для загрузки картинок товаров (Этап 4)
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname) || '.jpg';
-    const uniqueName = 'opium-' + Date.now() + '-' + Math.round(Math.random() * 1e4) + ext;
+    const uniqueName = 'prod-' + Date.now() + '-' + Math.round(Math.random() * 1e4) + ext;
     cb(null, uniqueName);
   }
 });
 const upload = multer({ storage });
 
-// Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Сессионные cookies (Этап 1)
 app.use(
   session({
-    secret: 'opium_archive_secret_key_2026',
+    secret: 'store_secret_session_key',
     resave: false,
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 24 // 1 день
+      maxAge: 1000 * 60 * 60 * 24
     }
   })
 );
 
-// Инициализация корзины в сессии
 app.use((req, res, next) => {
   if (!req.session.cart) {
     req.session.cart = [];
@@ -54,11 +49,10 @@ app.use((req, res, next) => {
   next();
 });
 
-// Кэширование каталога в памяти (Этап 6)
 let catalogCache = {
   data: null,
   timestamp: 0,
-  ttl: 60 * 1000 // 60 секунд
+  ttl: 60 * 1000
 };
 
 function invalidateCatalogCache() {
@@ -66,11 +60,6 @@ function invalidateCatalogCache() {
   catalogCache.timestamp = 0;
 }
 
-// -------------------------------------------------------------
-// ЭТАП 1. АВТОРИЗАЦИЯ, РЕГИСТРАЦИЯ И ВАЛИДАЦИЯ
-// -------------------------------------------------------------
-
-// Правила валидации регистрации
 const registrationValidationRules = [
   body('login')
     .trim()
@@ -93,7 +82,6 @@ const registrationValidationRules = [
     .withMessage('Введите корректный адрес электронной почты')
 ];
 
-// Регистрация
 app.post('/api/auth/register', registrationValidationRules, async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -127,11 +115,10 @@ app.post('/api/auth/register', registrationValidationRules, async (req, res) => 
     res.json({ success: true, user: req.session.user });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Ошибка сервера при регистрации' });
+    res.status(500).json({ error: 'Ошибка сервера' });
   }
 });
 
-// Авторизация (Login)
 app.post('/api/auth/login', async (req, res) => {
   const { login, password } = req.body;
 
@@ -162,27 +149,20 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-// Выход (Logout)
 app.post('/api/auth/logout', (req, res) => {
   req.session.destroy(err => {
     if (err) {
-      return res.status(500).json({ error: 'Не удалось завершить сеанс' });
+      return res.status(500).json({ error: 'Ошибка при выходе' });
     }
     res.clearCookie('connect.sid');
     res.json({ success: true });
   });
 });
 
-// Текущий пользователь
 app.get('/api/auth/me', (req, res) => {
   res.json({ user: req.session.user || null });
 });
 
-// -------------------------------------------------------------
-// ЭТАП 4 & ЭТАП 6. КАТАЛОГ И ТОВАРЫ (С КЭШЕМ И MULTER)
-// -------------------------------------------------------------
-
-// Список товаров (кэшируется в памяти по ТЗ Этап 6)
 app.get('/api/products', async (req, res) => {
   try {
     const now = Date.now();
@@ -210,7 +190,6 @@ app.get('/api/products', async (req, res) => {
   }
 });
 
-// Детали товара + отзывы + проверка права на отзыв (Этап 3)
 app.get('/api/products/:id', async (req, res) => {
   const productId = req.params.id;
   try {
@@ -224,7 +203,6 @@ app.get('/api/products/:id', async (req, res) => {
       [productId]
     );
 
-    // Проверяем, может ли текущий пользователь оставить отзыв (только если есть заказ со статусом "Завершено")
     let canReview = false;
     if (req.session.user) {
       const orderCheck = await dbGet(`
@@ -246,15 +224,14 @@ app.get('/api/products/:id', async (req, res) => {
   }
 });
 
-// Добавление товара администратором с загрузкой обложки Multer (Этапы 4 и 5)
 app.post('/api/products', upload.single('image'), async (req, res) => {
   if (!req.session.user || req.session.user.role !== 'admin') {
-    return res.status(403).json({ error: 'Доступ запрещен. Только для администратора.' });
+    return res.status(403).json({ error: 'Доступ запрещен' });
   }
 
   const { title, description, price, stock, category } = req.body;
   if (!title || !price || stock === undefined) {
-    return res.status(400).json({ error: 'Заполните название, цену и остаток' });
+    return res.status(400).json({ error: 'Заполните обязательные поля' });
   }
 
   const imageFileName = req.file ? req.file.filename : '';
@@ -273,11 +250,6 @@ app.post('/api/products', upload.single('image'), async (req, res) => {
   }
 });
 
-// -------------------------------------------------------------
-// ЭТАП 2. КОРЗИНА И ОФОРМЛЕНИЕ ЗАКАЗА (CHECKOUT)
-// -------------------------------------------------------------
-
-// Получить корзину
 app.get('/api/cart', async (req, res) => {
   try {
     const cart = req.session.cart || [];
@@ -321,7 +293,6 @@ app.get('/api/cart', async (req, res) => {
   }
 });
 
-// Добавить в корзину
 app.post('/api/cart/add', async (req, res) => {
   const { productId, quantity = 1 } = req.body;
   const pId = parseInt(productId);
@@ -339,12 +310,12 @@ app.post('/api/cart/add', async (req, res) => {
     if (existingIndex > -1) {
       newQty = req.session.cart[existingIndex].quantity + qty;
       if (newQty > product.stock) {
-        return res.status(400).json({ error: `Нельзя добавить больше остатка на складе (${product.stock} шт.)` });
+        return res.status(400).json({ error: `Остаток на складе: ${product.stock} шт.` });
       }
       req.session.cart[existingIndex].quantity = newQty;
     } else {
       if (qty > product.stock) {
-        return res.status(400).json({ error: `Нельзя добавить больше остатка на складе (${product.stock} шт.)` });
+        return res.status(400).json({ error: `Остаток на складе: ${product.stock} шт.` });
       }
       req.session.cart.push({ productId: pId, quantity: qty });
     }
@@ -356,7 +327,6 @@ app.post('/api/cart/add', async (req, res) => {
   }
 });
 
-// Изменить количество в корзине
 app.post('/api/cart/update', async (req, res) => {
   const { productId, quantity } = req.body;
   const pId = parseInt(productId);
@@ -367,13 +337,13 @@ app.post('/api/cart/update', async (req, res) => {
     if (!product) return res.status(404).json({ error: 'Товар не найден' });
 
     const itemIndex = req.session.cart.findIndex(i => i.productId === pId);
-    if (itemIndex === -1) return res.status(404).json({ error: 'Товар в корзине не найден' });
+    if (itemIndex === -1) return res.status(404).json({ error: 'Позиция в корзине не найдена' });
 
     if (qty <= 0) {
       req.session.cart.splice(itemIndex, 1);
     } else {
       if (qty > product.stock) {
-        return res.status(400).json({ error: `Максимально доступно: ${product.stock} шт.` });
+        return res.status(400).json({ error: `Доступно только ${product.stock} шт.` });
       }
       req.session.cart[itemIndex].quantity = qty;
     }
@@ -385,7 +355,6 @@ app.post('/api/cart/update', async (req, res) => {
   }
 });
 
-// Удалить из корзины
 app.post('/api/cart/remove', (req, res) => {
   const { productId } = req.body;
   const pId = parseInt(productId);
@@ -393,7 +362,6 @@ app.post('/api/cart/remove', (req, res) => {
   res.json({ success: true });
 });
 
-// Очистить корзину
 app.post('/api/cart/clear', (req, res) => {
   req.session.cart = [];
   req.session.promoCode = null;
@@ -401,7 +369,6 @@ app.post('/api/cart/clear', (req, res) => {
   res.json({ success: true });
 });
 
-// Применить промокод (Этап 6)
 app.post('/api/promo/apply', (req, res) => {
   const { code } = req.body;
   const promoMap = {
@@ -418,23 +385,22 @@ app.post('/api/promo/apply', (req, res) => {
       success: true,
       code: cleanCode,
       discount: promoMap[cleanCode],
-      message: `Промокод применен: скидка ${promoMap[cleanCode]}%`
+      message: `Скидка ${promoMap[cleanCode]}% применена`
     });
   }
 
-  res.status(400).json({ error: 'Неверный промокод. Попробуйте OPIUM10, KAIANGEL или VIPER20' });
+  res.status(400).json({ error: 'Неверный промокод' });
 });
 
-// Оформление заказа (Checkout)
 app.post('/api/checkout', async (req, res) => {
   if (!req.session.user) {
-    return res.status(401).json({ error: 'Для оформления заказа необходимо авторизоваться' });
+    return res.status(401).json({ error: 'Требуется авторизация' });
   }
 
   const { delivery_method, delivery_date, payment_method, customer_name, customer_phone } = req.body;
 
   if (!delivery_method || !delivery_date || !payment_method || !customer_name || !customer_phone) {
-    return res.status(400).json({ error: 'Пожалуйста, заполните все поля оформления заказа' });
+    return res.status(400).json({ error: 'Заполните все поля формы' });
   }
 
   const cart = req.session.cart || [];
@@ -443,25 +409,23 @@ app.post('/api/checkout', async (req, res) => {
   }
 
   try {
-    // 1. Проверяем наличие всех товаров на складе
     let subtotal = 0;
     const itemsToOrder = [];
 
     for (const item of cart) {
       const product = await dbGet('SELECT * FROM products WHERE id = ?', [item.productId]);
       if (!product) {
-        return res.status(400).json({ error: `Товар ID ${item.productId} больше не существует` });
+        return res.status(400).json({ error: `Товар не найден` });
       }
       if (product.stock < item.quantity) {
         return res.status(400).json({
-          error: `Недостаточно товара "${product.title}" на складе (остаток: ${product.stock} шт.)`
+          error: `Недостаточно товара "${product.title}" на складе`
         });
       }
       subtotal += product.price * item.quantity;
       itemsToOrder.push({ product, quantity: item.quantity });
     }
 
-    // Скидка по промокоду
     const promoDiscount = req.session.promoDiscount || 0;
     const promoCode = req.session.promoCode || null;
     const discountAmount = Math.round((subtotal * promoDiscount) / 100);
@@ -469,7 +433,6 @@ app.post('/api/checkout', async (req, res) => {
 
     const nowIso = new Date().toLocaleString('ru-RU');
 
-    // 2. Создаем заказ со статусом "Новый" (Этап 2)
     const orderResult = await dbRun(`
       INSERT INTO orders (
         user_id, customer_name, customer_phone, delivery_method, 
@@ -489,7 +452,6 @@ app.post('/api/checkout', async (req, res) => {
 
     const orderId = orderResult.id;
 
-    // 3. Атомарно уменьшаем остаток на складе (product.stock) и сохраняем позиции заказа
     for (const item of itemsToOrder) {
       await dbRun(
         'UPDATE products SET stock = stock - ? WHERE id = ?',
@@ -502,7 +464,6 @@ app.post('/api/checkout', async (req, res) => {
       `, [orderId, item.product.id, item.product.title, item.product.price, item.quantity]);
     }
 
-    // 4. Очищаем корзину и сбрасываем кэш
     req.session.cart = [];
     req.session.promoCode = null;
     req.session.promoDiscount = 0;
@@ -511,19 +472,14 @@ app.post('/api/checkout', async (req, res) => {
     res.json({
       success: true,
       orderId,
-      message: 'Заказ успешно оформлен со статусом «Новый»'
+      message: 'Заказ успешно оформлен'
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Ошибка при оформлении заказа' });
+    res.status(500).json({ error: 'Ошибка оформления заказа' });
   }
 });
 
-// -------------------------------------------------------------
-// ЭТАП 3. ЛИЧНЫЙ КАБИНЕТ И СТРОГАЯ СИСТЕМА ОТЗЫВОВ
-// -------------------------------------------------------------
-
-// История заказов пользователя
 app.get('/api/orders/my', async (req, res) => {
   if (!req.session.user) {
     return res.status(401).json({ error: 'Требуется авторизация' });
@@ -549,10 +505,9 @@ app.get('/api/orders/my', async (req, res) => {
   }
 });
 
-// Добавление отзыва (Строго: только если товар есть в заказе со статусом «Завершено»)
 app.post('/api/products/:id/reviews', async (req, res) => {
   if (!req.session.user) {
-    return res.status(401).json({ error: 'Авторизуйтесь, чтобы оставить отзыв' });
+    return res.status(401).json({ error: 'Требуется авторизация' });
   }
 
   const productId = parseInt(req.params.id);
@@ -560,7 +515,7 @@ app.post('/api/products/:id/reviews', async (req, res) => {
   const numRating = parseInt(rating);
 
   if (!numRating || numRating < 1 || numRating > 5) {
-    return res.status(400).json({ error: 'Оценка должна быть от 1 до 5 звезд' });
+    return res.status(400).json({ error: 'Оценка должна быть от 1 до 5' });
   }
 
   if (!comment || comment.trim().length === 0) {
@@ -568,7 +523,6 @@ app.post('/api/products/:id/reviews', async (req, res) => {
   }
 
   try {
-    // Строгая проверка по ТЗ: только для покупателей, у которых данный товар есть в заказе со статусом «Завершено»
     const orderCheck = await dbGet(`
       SELECT o.id FROM orders o
       JOIN order_items oi ON o.id = oi.order_id
@@ -578,7 +532,7 @@ app.post('/api/products/:id/reviews', async (req, res) => {
 
     if (!orderCheck) {
       return res.status(403).json({
-        error: 'Оставить отзыв могут исключительно покупатели, у которых данный товар есть в заказе со статусом «Завершено»!'
+        error: 'Оставить отзыв могут только покупатели с завершенным заказом на этот товар'
       });
     }
 
@@ -590,21 +544,16 @@ app.post('/api/products/:id/reviews', async (req, res) => {
     `, [productId, req.session.user.id, req.session.user.full_name || req.session.user.login, numRating, comment.trim(), nowStr]);
 
     invalidateCatalogCache();
-    res.json({ success: true, message: 'Отзыв успешно добавлен' });
+    res.json({ success: true, message: 'Отзыв опубликован' });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Ошибка сохранения отзыва' });
+    res.status(500).json({ error: 'Ошибка при сохранении отзыва' });
   }
 });
 
-// -------------------------------------------------------------
-// ЭТАП 5. ПАНЕЛЬ АДМИНИСТРАТОРА (lab16 / prac3)
-// -------------------------------------------------------------
-
-// Список заказов для админа с фильтрацией по статусам
 app.get('/api/admin/orders', async (req, res) => {
   if (!req.session.user || req.session.user.role !== 'admin') {
-    return res.status(403).json({ error: 'Доступ разрешен только администратору' });
+    return res.status(403).json({ error: 'Доступ запрещен' });
   }
 
   const { status } = req.query;
@@ -632,10 +581,9 @@ app.get('/api/admin/orders', async (req, res) => {
   }
 });
 
-// Одиночное изменение статуса заказа
 app.post('/api/admin/orders/:id/status', async (req, res) => {
   if (!req.session.user || req.session.user.role !== 'admin') {
-    return res.status(403).json({ error: 'Доступ разрешен только администратору' });
+    return res.status(403).json({ error: 'Доступ запрещен' });
   }
 
   const orderId = req.params.id;
@@ -643,7 +591,7 @@ app.post('/api/admin/orders/:id/status', async (req, res) => {
 
   const validStatuses = ['Новый', 'В обработке', 'Завершено'];
   if (!validStatuses.includes(status)) {
-    return res.status(400).json({ error: 'Недопустимый статус заказа' });
+    return res.status(400).json({ error: 'Недопустимый статус' });
   }
 
   try {
@@ -655,21 +603,20 @@ app.post('/api/admin/orders/:id/status', async (req, res) => {
   }
 });
 
-// Массовая смена статуса заказов (Этап 5 ТЗ)
 app.post('/api/admin/orders/batch-status', async (req, res) => {
   if (!req.session.user || req.session.user.role !== 'admin') {
-    return res.status(403).json({ error: 'Доступ разрешен только администратору' });
+    return res.status(403).json({ error: 'Доступ запрещен' });
   }
 
   const { orderIds, status } = req.body;
 
   if (!Array.isArray(orderIds) || orderIds.length === 0) {
-    return res.status(400).json({ error: 'Выберите хотя бы один заказ' });
+    return res.status(400).json({ error: 'Выберите заказы' });
   }
 
   const validStatuses = ['Новый', 'В обработке', 'Завершено'];
   if (!validStatuses.includes(status)) {
-    return res.status(400).json({ error: 'Недопустимый статус заказа' });
+    return res.status(400).json({ error: 'Недопустимый статус' });
   }
 
   try {
@@ -683,11 +630,6 @@ app.post('/api/admin/orders/batch-status', async (req, res) => {
   }
 });
 
-// -------------------------------------------------------------
-// ЭТАП 6. ИЗБРАННОЕ (WISHLIST)
-// -------------------------------------------------------------
-
-// Получить избранное пользователя
 app.get('/api/wishlist', async (req, res) => {
   if (!req.session.user) {
     return res.json({ wishlist: [] });
@@ -707,10 +649,9 @@ app.get('/api/wishlist', async (req, res) => {
   }
 });
 
-// Переключить избранное (добавить/удалить)
 app.post('/api/wishlist/toggle', async (req, res) => {
   if (!req.session.user) {
-    return res.status(401).json({ error: 'Авторизуйтесь, чтобы добавлять в избранное' });
+    return res.status(401).json({ error: 'Требуется авторизация' });
   }
 
   const { productId } = req.body;
@@ -735,16 +676,14 @@ app.post('/api/wishlist/toggle', async (req, res) => {
   }
 });
 
-// Запуск сервера и инициализация БД
 async function startServer() {
   try {
     await initDatabase();
     app.listen(PORT, () => {
-      console.log(`[SERVER] Сервер запущен на http://localhost:${PORT}`);
-      console.log(`[ADMIN] Доступ в панель администратора: логин lab16, пароль prac3`);
+      console.log(`Server started on http://localhost:${PORT}`);
     });
   } catch (err) {
-    console.error('Ошибка при запуске сервера:', err);
+    console.error(err);
   }
 }
 

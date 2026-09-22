@@ -4,7 +4,6 @@ const path = require('path');
 const dbPath = path.join(__dirname, 'dev.db');
 const db = new sqlite3.Database(dbPath);
 
-// Простые промис-обертки для удобного и чистого кода с async/await
 const dbRun = (sql, params = []) => {
   return new Promise((resolve, reject) => {
     db.run(sql, params, function (err) {
@@ -32,9 +31,7 @@ const dbAll = (sql, params = []) => {
   });
 };
 
-// Инициализация таблиц БД
 async function initDatabase() {
-  // 1. Таблица пользователей
   await dbRun(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -47,7 +44,6 @@ async function initDatabase() {
     )
   `);
 
-  // 2. Таблица товаров (в стиле Opium / Archive)
   await dbRun(`
     CREATE TABLE IF NOT EXISTS products (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -60,7 +56,6 @@ async function initDatabase() {
     )
   `);
 
-  // 3. Таблица заказов
   await dbRun(`
     CREATE TABLE IF NOT EXISTS orders (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -78,7 +73,6 @@ async function initDatabase() {
     )
   `);
 
-  // 4. Позиции в заказе
   await dbRun(`
     CREATE TABLE IF NOT EXISTS order_items (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -92,7 +86,6 @@ async function initDatabase() {
     )
   `);
 
-  // 5. Отзывы (только для покупателей с завершенным заказом)
   await dbRun(`
     CREATE TABLE IF NOT EXISTS reviews (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -107,7 +100,6 @@ async function initDatabase() {
     )
   `);
 
-  // 6. Избранное (Wishlist)
   await dbRun(`
     CREATE TABLE IF NOT EXISTS wishlist (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -119,31 +111,28 @@ async function initDatabase() {
     )
   `);
 
-  // Создание администратора lab16 / prac3 по ТЗ (Этап 5)
   const admin = await dbGet('SELECT * FROM users WHERE login = ?', ['lab16']);
   if (!admin) {
     await dbRun(`
       INSERT INTO users (login, password, full_name, phone, email, role)
       VALUES (?, ?, ?, ?, ?, ?)
-    `, ['lab16', 'prac3', 'Администратор Системы', '8(999)000-00-00', 'admin@opium-archive.store', 'admin']);
-    console.log('[DB] Администратор lab16 успешно создан.');
+    `, ['lab16', 'prac3', 'Администратор', '8(999)000-00-00', 'admin@store.local', 'admin']);
   }
 
-  // Заполнение каталога товарами opium/archive/kai angel, если каталог пуст
   const countRow = await dbGet('SELECT COUNT(*) as count FROM products');
   if (countRow.count === 0) {
     const seedProducts = [
       {
         title: "Archive Heavy Distressed Hoodie 'VIPER'",
-        description: 'Оверсайз худи с эффектом состаривания, кислотной вываркой, необработанными краями и массивными металлическими кольцами. Культовый силуэт Kai Angel.',
+        description: 'Оверсайз худи с эффектом состаривания, вываркой швов и металлической фурнитурой.',
         price: 8900,
         stock: 15,
-        image: '', // Пустая картинка для демонстрации заглушки no_image.jpg по ТЗ
+        image: '',
         category: 'Худи'
       },
       {
         title: 'Opium Cobweb Distressed Knit',
-        description: 'Черный рваный джемпер с плетением "паутина" и спущенными петлями в стилистике темного ретрофутуризма.',
+        description: 'Черный рваный джемпер фактурного плетения в темной минималистичной стилистике.',
         price: 7400,
         stock: 8,
         image: '',
@@ -151,7 +140,7 @@ async function initDatabase() {
       },
       {
         title: 'Waxed Mud-Wash Flared Cargo Pants',
-        description: 'Архивные вощеные штаны клеш со сложным кроем коленей, двойными карманами и хромированными заклепками.',
+        description: 'Архивные вощеные штаны клеш со сложным кроем коленей и карманами.',
         price: 11900,
         stock: 12,
         image: '',
@@ -159,7 +148,7 @@ async function initDatabase() {
       },
       {
         title: 'Cyber-Goth Asymmetric Leather Jacket',
-        description: 'Косуха из плотной зернистой кожи с высоким воротником-стойкой, молниями Raccagni и съемными стропами.',
+        description: 'Куртка из плотной кожи с асимметричной металлической молнией и воротником-стойкой.',
         price: 24900,
         stock: 5,
         image: '',
@@ -167,7 +156,7 @@ async function initDatabase() {
       },
       {
         title: 'Steel-Spiked Balaclava Beanie',
-        description: 'Трансформируемая балаклава из плотного риба с хромированными шипами и вышитым логотипом.',
+        description: 'Трансформируемая балаклава из плотного риба с металлическими акцентами.',
         price: 3200,
         stock: 20,
         image: '',
@@ -175,7 +164,7 @@ async function initDatabase() {
       },
       {
         title: 'Platform Brutal Armor Boots',
-        description: 'Массивные ботинки на 7-сантиметровой тракторной платформе со стальными накладками на мыске.',
+        description: 'Массивные кожаные ботинки на высокой подошве со стальной защитной вставкой.',
         price: 17500,
         stock: 7,
         image: '',
@@ -189,7 +178,6 @@ async function initDatabase() {
         [p.title, p.description, p.price, p.stock, p.image, p.category]
       );
     }
-    console.log('[DB] Стартовые товары Opium/Archive успешно добавлены.');
   }
 }
 
