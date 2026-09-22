@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>OPIUM ARCHIVE — Dark Fashion & Kai Angel Aesthetic</title>
+  <meta name="description" content="Культовый архивный магазин одежды в стиле Opium, Kai Angel, 9mice и темного ретрофутуризма.">
+  
+  <!-- Шрифты для зловещей готической эстетики -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800;900&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Навигационная панель -->
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="brand" onclick="navigateTo('catalog')">
+        <span class="brand-sub">ARCHIVE // KAI</span>
+        <span class="brand-title">OPIUM STORE</span>
+      </div>
+
+      <nav class="nav-links">
+        <button class="nav-btn active" id="navCatalogBtn" onclick="navigateTo('catalog')">Каталог</button>
+        <button class="nav-btn" id="navWishlistBtn" onclick="navigateTo('wishlist')">
+          Избранное <span class="badge" id="wishlistBadge">0</span>
+        </button>
+        <button class="nav-btn" id="navProfileBtn" onclick="openProfileOrAuth()">
+          <span id="navProfileText">Войти</span>
+        </button>
+        <button class="nav-btn admin-link" id="navAdminBtn" onclick="navigateTo('admin')" style="display: none;">
+          ⚡ Админка
+        </button>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="cart-trigger" id="cartTrigger" onclick="openCart()">
+          <span class="cart-icon">🕷️</span>
+          <span class="cart-text">Корзина</span>
+          <span class="badge" id="cartBadge">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Главный контейнер страниц -->
+  <main class="main-content">
+
+    <!-- СЕКЦИЯ: КАТАЛОГ -->
+    <section id="catalogView" class="view-section active">
+      <!-- Зловещий ретрофутуристичный баннер -->
+      <div class="hero-banner">
+        <div class="hero-glitch-box">
+          <div class="hero-tag">SS/26 NEW DROP • ARCHIVE OPIUM</div>
+          <h1 class="hero-heading">КАК У КАЕНЖИЛА</h1>
+          <p class="hero-desc">Зловещие силуэты, вываренный деним, тяжелая кожа, металлические шипы и архивный оверсайз.</p>
+          <div class="promo-strip">
+            <span>Промокод на 10%: <strong class="code-pill" onclick="copyCode('OPIUM10')">OPIUM10</strong></span>
+            <span>Скидка 15%: <strong class="code-pill" onclick="copyCode('KAIANGEL')">KAIANGEL</strong></span>
+            <span>VIP 20%: <strong class="code-pill" onclick="copyCode('VIPER20')">VIPER20</strong></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Фильтры категорий -->
+      <div class="category-bar">
+        <button class="cat-chip active" onclick="filterCategory('Все')">Все позиции</button>
+        <button class="cat-chip" onclick="filterCategory('Худи')">Худи & Свитшоты</button>
+        <button class="cat-chip" onclick="filterCategory('Свитеры')">Трикотаж</button>
+        <button class="cat-chip" onclick="filterCategory('Штаны')">Штаны & Карго</button>
+        <button class="cat-chip" onclick="filterCategory('Куртки')">Верхняя одежда</button>
+        <button class="cat-chip" onclick="filterCategory('Обувь')">Обувь</button>
+        <button class="cat-chip" onclick="filterCategory('Аксессуары')">Аксессуары</button>
+      </div>
+
+      <!-- Сетка товаров -->
+      <div class="products-grid" id="productsGrid">
+        <!-- Генерируется из app.js -->
+      </div>
+    </section>
+
+    <!-- СЕКЦИЯ: ИЗБРАННОЕ (WISHLIST) -->
+    <section id="wishlistView" class="view-section">
+      <div class="section-header">
+        <h2 class="section-title">Избранные вещи</h2>
+        <p class="section-subtitle">Ваша персональная коллекция сохраненных архивных айтемов</p>
+      </div>
+      <div class="products-grid" id="wishlistGrid">
+        <!-- Генерируется из app.js -->
+      </div>
+    </section>
+
+    <!-- СЕКЦИЯ: ЛИЧНЫЙ КАБИНЕТ -->
+    <section id="profileView" class="view-section">
+      <div class="section-header">
+        <h2 class="section-title">Личный кабинет</h2>
+        <p class="section-subtitle">Управление аккаунтом и история заказов</p>
+      </div>
+
+      <div class="profile-layout">
+        <!-- Карточка пользователя -->
+        <div class="profile-card">
+          <div class="profile-avatar">✞</div>
+          <h3 id="profileFullName" class="profile-name">Имя Фамилия</h3>
+          <p id="profileLogin" class="profile-handle">@login</p>
+          <div class="profile-details">
+            <div class="detail-row"><span>Телефон:</span> <strong id="profilePhone">-</strong></div>
+            <div class="detail-row"><span>Email:</span> <strong id="profileEmail">-</strong></div>
+            <div class="detail-row"><span>Статус:</span> <strong id="profileRole">Покупатель</strong></div>
+          </div>
+          <button class="btn btn-danger full-width mt-15" onclick="logout()">Выйти из аккаунта</button>
+        </div>
+
+        <!-- История заказов (Этап 3) -->
+        <div class="orders-history-panel">
+          <h3 class="panel-title">История ваших заказов</h3>
+          <div id="ordersList" class="orders-list">
+            <!-- Заказы пользователя -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- СЕКЦИЯ: АДМИН-ПАНЕЛЬ (Этап 5) -->
+    <section id="adminView" class="view-section">
+      <div class="section-header">
+        <h2 class="section-title">Панель управления (Admin: lab16)</h2>
+        <p class="section-subtitle">Контроль заказов, массовая смена статусов и добавление товаров с Multer</p>
+      </div>
+
+      <!-- Вкладки админки -->
+      <div class="admin-tabs">
+        <button class="admin-tab-btn active" id="tabOrdersBtn" onclick="switchAdminTab('orders')">Управление заказами</button>
+        <button class="admin-tab-btn" id="tabAddProductBtn" onclick="switchAdminTab('add-product')">Добавить товар (Multer)</button>
+      </div>
+
+      <!-- Вкладка 1: Заказы -->
+      <div id="adminOrdersSubView" class="admin-subview active">
+        <!-- Фильтры статусов -->
+        <div class="admin-filter-bar">
+          <div class="filter-group">
+            <label>Фильтр по статусу:</label>
+            <select id="adminStatusFilter" onchange="loadAdminOrders()">
+              <option value="Все">Все заказы</option>
+              <option value="Новый">Новый</option>
+              <option value="В обработке">В обработке</option>
+              <option value="Завершено">Завершено</option>
+            </select>
+          </div>
+
+          <!-- Массовая смена статусов -->
+          <div class="batch-group">
+            <label>Массовое действие:</label>
+            <select id="adminBatchStatus">
+              <option value="В обработке">Перевести в «В обработке»</option>
+              <option value="Завершено">Перевести в «Завершено»</option>
+              <option value="Новый">Перевести в «Новый»</option>
+            </select>
+            <button class="btn btn-secondary" onclick="applyBatchStatus()">Применить к выбранным</button>
+          </div>
+        </div>
+
+        <div id="adminOrdersList" class="admin-orders-list">
+          <!-- Карточки заказов для админа -->
+        </div>
+      </div>
+
+      <!-- Вкладка 2: Добавление товара через Multer -->
+      <div id="adminProductSubView" class="admin-subview">
+        <div class="card form-card">
+          <h3 class="form-title">Загрузка нового товара в каталог</h3>
+          <form id="addProductForm" onsubmit="submitNewProduct(event)">
+            <div class="form-group">
+              <label>Название товара *</label>
+              <input type="text" name="title" id="prodTitle" placeholder="Например: Opium Distressed Denim" required>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Категория *</label>
+                <select name="category" id="prodCategory">
+                  <option value="Худи">Худи</option>
+                  <option value="Свитеры">Свитеры</option>
+                  <option value="Штаны">Штаны</option>
+                  <option value="Куртки">Куртки</option>
+                  <option value="Обувь">Обувь</option>
+                  <option value="Аксессуары">Аксессуары</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Цена (₽) *</label>
+                <input type="number" name="price" id="prodPrice" placeholder="9900" min="1" required>
+              </div>
+              <div class="form-group">
+                <label>Остаток на складе *</label>
+                <input type="number" name="stock" id="prodStock" placeholder="10" min="0" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Описание</label>
+              <textarea name="description" id="prodDesc" rows="3" placeholder="Мрачное архивное описание..."></textarea>
+            </div>
+            <div class="form-group">
+              <label>Обложка товара (Multer /public/uploads/):</label>
+              <input type="file" name="image" id="prodImage" accept="image/*">
+              <p class="field-hint">Если фото не загружено, по ТЗ автоматически будет использована заглушка <strong>no_image.jpg</strong></p>
+            </div>
+            <button type="submit" class="btn btn-primary full-width">Опубликовать товар</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- МОДАЛЬНОЕ ОКНО: ДЕТАЛИ ТОВАРА И СТРОГИЕ ОТЗЫВЫ (Этап 3 & 4) -->
+  <div class="modal-overlay" id="productModal">
+    <div class="modal-box modal-lg">
+      <button class="modal-close" onclick="closeProductModal()">✕</button>
+      <div class="product-modal-content" id="productModalContent">
+        <!-- Генерируется динамически -->
+      </div>
+    </div>
+  </div>
+
+  <!-- БОКОВАЯ КОРЗИНА / МОДАЛКА КОРЗИНЫ (Этап 2) -->
+  <div class="drawer-overlay" id="cartDrawer">
+    <div class="drawer-content">
+      <div class="drawer-header">
+        <h3 class="drawer-title">Корзина товаров</h3>
+        <button class="modal-close" onclick="closeCart()">✕</button>
+      </div>
+
+      <div class="cart-items-container" id="cartItemsList">
+        <!-- Позиции корзины -->
+      </div>
+
+      <div class="cart-footer">
+        <!-- Ввод промокода (Этап 6) -->
+        <div class="promo-box">
+          <input type="text" id="promoInput" placeholder="Промокод (напр. VIPER20)">
+          <button class="btn btn-secondary btn-sm" onclick="applyPromo()">Применить</button>
+        </div>
+        <div id="promoNotice" class="promo-notice"></div>
+
+        <div class="cart-summary">
+          <div class="summary-line">
+            <span>Промежуточный итог:</span>
+            <span id="cartSubtotal">0 ₽</span>
+          </div>
+          <div class="summary-line discount-line" id="discountRow" style="display: none;">
+            <span>Скидка по коду:</span>
+            <span id="cartDiscount">-0 ₽</span>
+          </div>
+          <div class="summary-line total-line">
+            <span>К оплате:</span>
+            <span id="cartFinalTotal">0 ₽</span>
+          </div>
+        </div>
+
+        <div class="cart-actions">
+          <button class="btn btn-danger btn-sm" onclick="clearCart()">Очистить</button>
+          <button class="btn btn-primary full-width" id="checkoutBtn" onclick="openCheckout()">Оформить заказ</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- МОДАЛЬНОЕ ОКНО: ОФОРМЛЕНИЕ ЗАКАЗА (CHECKOUT, Этап 2) -->
+  <div class="modal-overlay" id="checkoutModal">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeCheckout()">✕</button>
+      <h3 class="modal-title">Оформление заказа</h3>
+      <p class="modal-subtitle">Заполните детали для быстрой доставки архива</p>
+
+      <form id="checkoutForm" onsubmit="submitCheckout(event)">
+        <div class="form-group">
+          <label>ФИО получателя *</label>
+          <input type="text" id="orderName" required placeholder="Иванов Иван Иванович">
+        </div>
+        <div class="form-group">
+          <label>Контактный телефон *</label>
+          <input type="text" id="orderPhone" required placeholder="8(999)123-45-67">
+        </div>
+
+        <div class="form-group">
+          <label>Способ доставки (Выпадающий список) *</label>
+          <select id="orderDeliveryMethod" required>
+            <option value="Курьер CDEK VIP (Лично в руки)">Курьер CDEK VIP (Лично в руки)</option>
+            <option value="Пункт выдачи заказов Boxberry">Пункт выдачи заказов Boxberry</option>
+            <option value="Постамат 24/7 Х5">Постамат 24/7 Х5</option>
+            <option value="Самовывоз из Opium Archive Hub (Москва)">Самовывоз из Opium Archive Hub (Москва)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Желаемая дата доставки *</label>
+          <input type="date" id="orderDeliveryDate" required>
+        </div>
+
+        <div class="form-group">
+          <label>Способ оплаты *</label>
+          <select id="orderPaymentMethod" required>
+            <option value="При получении">При получении (Наличные / Терминал)</option>
+            <option value="СБП">СБП (Система быстрых платежей по QR)</option>
+          </select>
+        </div>
+
+        <div class="checkout-total-banner">
+          <span>Итоговая сумма списания:</span>
+          <strong id="checkoutTotalAmount">0 ₽</strong>
+        </div>
+
+        <button type="submit" class="btn btn-primary full-width mt-15" id="confirmOrderBtn">
+          Подтвердить заказ (Статус: «Новый»)
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- МОДАЛЬНОЕ ОКНО: АВТОРИЗАЦИЯ И РЕГИСТРАЦИЯ (Этап 1) -->
+  <div class="modal-overlay" id="authModal">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeAuthModal()">✕</button>
+
+      <!-- ТАБЫ: ВХОД / РЕГИСТРАЦИЯ -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="authTabLogin" onclick="switchAuthTab('login')">Вход</button>
+        <button class="auth-tab" id="authTabRegister" onclick="switchAuthTab('register')">Регистрация</button>
+      </div>
+
+      <!-- ФОРМА ВХОДА (LOGIN) -->
+      <div id="loginFormContainer" class="auth-subform active">
+        <form id="loginForm" onsubmit="submitLogin(event)">
+          <div class="form-group">
+            <label>Логин</label>
+            <input type="text" id="loginUsername" placeholder="Ваш логин" required>
+          </div>
+          <div class="form-group">
+            <label>Пароль</label>
+            <input type="password" id="loginPassword" placeholder="Ваш пароль" required>
+          </div>
+
+          <div id="loginError" class="server-error-msg"></div>
+
+          <button type="submit" class="btn btn-primary full-width mt-10">Войти</button>
+
+          <!-- Обязательное навигационное требование по ТЗ -->
+          <div class="auth-nav-link">
+            <span>Еще не зарегистрированы?</span>
+            <button type="button" class="link-btn" onclick="switchAuthTab('register')">Регистрация</button>
+          </div>
+
+          <div class="quick-admin-box">
+            <small>Тестовый аккаунт администратора по ТЗ:</small>
+            <button type="button" class="btn btn-ghost btn-sm" onclick="quickFillAdmin()">Вход как lab16 (prac3)</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ФОРМА РЕГИСТРАЦИИ С ВАЛИДАЦИЕЙ В РЕАЛЬНОМ ВРЕМЕНИ (Этап 1) -->
+      <div id="registerFormContainer" class="auth-subform">
+        <form id="registerForm" onsubmit="submitRegister(event)" novalidate>
+          <div class="form-group">
+            <label>Логин * (латиница и цифры, не менее 6 симв.)</label>
+            <input type="text" id="regLogin" placeholder="kaiangel2026" oninput="validateField('login')">
+            <span class="field-error" id="err-regLogin"></span>
+          </div>
+
+          <div class="form-group">
+            <label>Пароль * (минимум 8 символов)</label>
+            <input type="password" id="regPassword" placeholder="••••••••" oninput="validateField('password')">
+            <span class="field-error" id="err-regPassword"></span>
+          </div>
+
+          <div class="form-group">
+            <label>ФИО * (символы кириллицы и пробелы)</label>
+            <input type="text" id="regFullName" placeholder="Иванов Иван Иванович" oninput="validateField('fullName')">
+            <span class="field-error" id="err-regFullName"></span>
+          </div>
+
+          <div class="form-group">
+            <label>Телефон * (формат 8(XXX)XXX-XX-XX)</label>
+            <input type="text" id="regPhone" placeholder="8(999)123-45-67" oninput="validateField('phone')">
+            <span class="field-error" id="err-regPhone"></span>
+          </div>
+
+          <div class="form-group">
+            <label>Электронная почта *</label>
+            <input type="email" id="regEmail" placeholder="viper@opium.store" oninput="validateField('email')">
+            <span class="field-error" id="err-regEmail"></span>
+          </div>
+
+          <div id="registerServerErrors" class="server-error-msg"></div>
+
+          <button type="submit" class="btn btn-primary full-width mt-10" id="regSubmitBtn">Зарегистрироваться</button>
+
+          <div class="auth-nav-link">
+            <span>Уже зарегистрированы?</span>
+            <button type="button" class="link-btn" onclick="switchAuthTab('login')">Войти</button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- TOAST УВЕДОМЛЕНИЯ -->
+  <div id="toastNotification" class="toast"></div>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-logo">OPIUM ARCHIVE STORE</div>
+      <p>Практическая работа №4 • Node.js Express REST API & SQLite • Стиль Opium / Kai Angel</p>
+      <div class="footer-links">
+        <span>SQLite: dev.db</span> •
+        <span>Admin: lab16 / prac3</span> •
+        <span>Mobile Ready: 390x844 px</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
