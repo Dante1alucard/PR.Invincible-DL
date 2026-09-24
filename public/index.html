@@ -3,19 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>ARCHIVE STORE</title>
-  <meta name="description" content="Архивная одежда и аксессуары">
+  <title>PI:DL // POST-INDUSTRIAL : DARK LABELS</title>
+  <meta name="description" content="PI:DL — Архивный деконструктивизм, distressed одежда и андеграундный крой">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Inter:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+  <!-- Side rail decorative guide lines (готовые поля под твои краевые декоры) -->
+  <div class="side-rail side-rail-left" aria-hidden="true">
+    <div class="rail-text">PI:DL // SPECIMEN ARCHIVE // 2026</div>
+  </div>
+  <div class="side-rail side-rail-right" aria-hidden="true">
+    <div class="rail-text">DISTRESSED DECONSTRUCT // NO RULES</div>
+  </div>
+
   <header class="navbar">
     <div class="nav-container">
       <div class="brand" onclick="navigateTo('catalog')">
-        <span class="brand-title">ARCHIVE // OPIUM</span>
+        <span class="brand-code">[ PI:DL ]</span>
+        <div class="brand-meta">
+          <span class="brand-title">POST-INDUSTRIAL</span>
+          <span class="brand-sub">DARK LABELS // ARCHIVE</span>
+        </div>
       </div>
 
       <nav class="nav-links">
@@ -27,7 +39,7 @@
           <span id="navProfileText">Войти</span>
         </button>
         <button class="nav-btn admin-link" id="navAdminBtn" onclick="navigateTo('admin')" style="display: none;">
-          Панель управления
+          [ ROOT // ADMIN ]
         </button>
       </nav>
 
@@ -44,13 +56,17 @@
 
     <section id="catalogView" class="view-section active">
       <div class="hero-banner">
-        <div class="hero-meta">COLLECTION 2026 / DROP 04</div>
-        <h1 class="hero-heading">OPIUM ARCHIVE</h1>
-        <p class="hero-desc">Культовые силуэты, вощеный деним, тяжелый хлопок и архивный крой.</p>
+        <div class="hero-meta">
+          <span class="meta-tag">[ SPECIMEN CATALOG ]</span>
+          <span class="meta-tag">BATCH 04 // DISTRESSED</span>
+          <span class="meta-tag">FALL-WINTER 2026</span>
+        </div>
+        <h1 class="hero-heading">PI:DL ARCHIVE</h1>
+        <p class="hero-desc">Деконструктивизм, тяжелый хлопок, distressed текстуры, вощеный деним и сырые необработанные швы. Одежда для тех, кто отвергает масс-маркет.</p>
         <div class="promo-strip">
-          <span>Скидка 10%: <button type="button" class="code-pill" onclick="copyCode('OPIUM10')">OPIUM10</button></span>
-          <span>Скидка 15%: <button type="button" class="code-pill" onclick="copyCode('KAIANGEL')">KAIANGEL</button></span>
-          <span>Скидка 20%: <button type="button" class="code-pill" onclick="copyCode('VIPER20')">VIPER20</button></span>
+          <span class="promo-item">DROP-10: <button type="button" class="code-pill" onclick="copyCode('OPIUM10')">OPIUM10</button></span>
+          <span class="promo-item">DROP-15: <button type="button" class="code-pill" onclick="copyCode('KAIANGEL')">KAIANGEL</button></span>
+          <span class="promo-item">DROP-20: <button type="button" class="code-pill" onclick="copyCode('VIPER20')">VIPER20</button></span>
         </div>
       </div>
 
@@ -365,8 +381,8 @@
 
   <footer class="footer">
     <div class="footer-content">
-      <div class="footer-logo">ARCHIVE STORE</div>
-      <p>Интернет-магазин на Node.js, Express и SQLite</p>
+      <div class="footer-logo">PI:DL // POST-INDUSTRIAL : DARK LABELS</div>
+      <p class="footer-sub">ARCHIVE DIVISION // NON-CONFORMIST CLOTHING SPECIMENS // 2026</p>
     </div>
   </footer>
 
