@@ -376,10 +376,10 @@ async function sendKladMessage(chatId, orderId, spot, orderItems = []) {
   if (isExtrimm) {
     header = `🖤 *P.I.D.L. // DARK LEGION — КЛАД #${orderId}* 💀 *[EXTRIMM]*`;
     sub = spot.category === 'police'
-      ? '🚨 *РЕЖИМ EXTRIMM: Локация у полицейского участка.* Будь предельно осторожен, не привлекай внимания патрулей.'
-      : '🏚 *РЕЖИМ EXTRIMM: Локация на заброшке.* Смотри под ноги, адреналиновый режим активирован.';
+      ? ' 15 Суток. Локация у полицейского участка.* Будь осторожен, объяснять долго придется...'
+      : ' Внимание, локация на заброшке.* Смотри под ноги, будь аккуратен, возможно, ты там не один...';
     locLabel = '📍 *Экстремальная локация (EXTRIMM):*';
-    warning = '⚠️ _ВНИМАНИЕ: Локация повышенного риска (полиция / заброшка). Не свети фонариком, действуй скрытно. Адрес действителен 48 часов._';
+    warning = '⚠️ _ВНИМАНИЕ: Локация где никто не отвечает за происходящее и твое дальнейшее состояние, иди на свой страх и риск. ';
   }
 
   const message =
@@ -404,12 +404,6 @@ ${warning}
   return await bot.sendMessage(chatId, message, { parse_mode: 'Markdown' });
 }
 
-/**
- * Отправляет рандомный адрес клада пользователю по username.
- * Если chat_id известен — отправляет прямо в ЛС.
- * Если пользователь новый — сохраняет в очередь и отдает прямую ссылку для мгновенного старта.
- * Параметр kladType: 'обычная' | 'EXTRIMM'
- */
 async function sendKladAddress(tgUsername, orderId, orderItems, kladType = 'обычная') {
   const username = (tgUsername || '').toLowerCase().replace(/^@/, '').trim();
   const spot = getRandomSpot(kladType);
@@ -431,7 +425,6 @@ async function sendKladAddress(tgUsername, orderId, orderItems, kladType = 'об
     timestamp: Date.now()
   };
 
-  // Сохраняем заказ в очереди по orderId и по username
   pendingOrdersByOrderId[String(orderId)] = orderRecord;
   if (username) {
     pendingOrders[username] = orderRecord;
@@ -468,7 +461,6 @@ function getBotInfo() {
   };
 }
 
-// Инициализируем бот при загрузке модуля
 initBot();
 
 module.exports = { sendKladAddress, getBotInfo, getRandomSpot, MOSCOW_SPOTS, EXTRIMM_SPOTS };

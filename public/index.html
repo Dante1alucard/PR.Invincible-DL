@@ -200,7 +200,7 @@
             <select id="adminStatusFilter" onchange="loadAdminOrders()">
               <option value="Все">Все</option>
               <option value="ПРИНЯТ">ПРИНЯТ...</option>
-              <option value="ОЖИДАЙТЕ">ОЖИДАЙТЕ..</option>
+              <option value="Жди...">Жди...</option>
               <option value="ПОЛУЧЕН">ПОЛУЧЕН...</option>
             </select>
           </div>
@@ -208,7 +208,7 @@
           <div class="batch-group">
             <select id="adminBatchStatus">
               <option value="принят">ПРИНЯТ...</option>
-              <option value="ожидайте">ОЖИДАЙТЕ..</option>
+              <option value="жди">Жди...</option>
               <option value="получен">ПОЛУЧЕН...</option>
             </select>
             <button class="btn btn-secondary" onclick="applyBatchStatus()">Применить к выбранным</button>
@@ -513,7 +513,7 @@
 
       <div class="auth-tabs">
         <button class="auth-tab active" id="authTabLogin" onclick="switchAuthTab('login')">Вход</button>
-        <button class="auth-tab" id="authTabRegister" onclick="switchAuthTab('register')">Регистрация</button>
+        <button class="auth-tab" id="authTabRegister" onclick="switchAuthTab('register')">Подшар</button>
       </div>
 
       <div id="loginFormContainer" class="auth-subform active">
@@ -532,8 +532,8 @@
           <button type="submit" class="btn btn-primary full-width mt-10">Войти</button>
 
           <div class="auth-nav-link">
-            <span>Еще не зарегистрированы?</span>
-            <button type="button" class="link-btn" onclick="switchAuthTab('register')">Регистрация</button>
+            <span>лейм?-> </span>
+            <button type="button" class="link-btn" onclick="switchAuthTab('register')">Подшарить за стиль</button>
           </div>
 
           <div class="quick-admin-box">
@@ -577,10 +577,10 @@
 
           <div id="registerServerErrors" class="server-error-msg"></div>
 
-          <button type="submit" class="btn btn-primary full-width mt-10" id="regSubmitBtn">Зарегистрироваться</button>
+          <button type="submit" class="btn btn-primary full-width mt-10" id="regSubmitBtn">Подшарить</button>
 
           <div class="auth-nav-link">
-            <span>Уже зарегистрированы?</span>
+            <span>Уже подшарены? </span>
             <button type="button" class="link-btn" onclick="switchAuthTab('login')">Войти</button>
           </div>
         </form>
@@ -594,7 +594,7 @@
   <footer class="footer">
     <div class="footer-content">
       <div class="footer-logo">P.I.D.L. // PROJECT invincible: DARK LEGION</div>
-      <p class="footer-sub">NON-CONFORMIST CLOTHING SPECIMENS // 2026</p>
+      <p class="footer-sub">OUTFITS OF FUTURE, BE INVINCIBLE.... // 2026</p>
     </div>
   </footer>
 

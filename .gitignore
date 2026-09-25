@@ -7,8 +7,7 @@ yarn-error.log*
 .env.*.local
 public/uploads/*
 !public/uploads/.gitkeep
-!public/uploads/no_image.jpg
-!public/uploads/no_image.png
 .DS_Store
 Thumbs.db
 *.log
+dev.db

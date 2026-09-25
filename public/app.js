@@ -369,7 +369,7 @@ async function openProductPage(productId, push = true) {
 
   const adminBannerHtml = (currentUser && currentUser.role === 'admin') ? `
     <div class="admin-product-banner">
-      <div><strong>⚡ [GOD MODE]</strong> Управление товаром #${p.id}</div>
+      <div><strong> [GOD MODE]</strong> Управление товаром #${p.id}</div>
       <div style="display: flex; gap: 8px;">
         <button class="btn btn-sm btn-admin-edit" onclick="openEditProductModal(${p.id})">✎ Редактировать</button>
         <button class="btn btn-sm btn-admin-delete" onclick="deleteProduct(${p.id}, '${escapeJs(p.title)}')">✕ Удалить</button>

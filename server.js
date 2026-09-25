@@ -182,10 +182,27 @@ app.get('/api/auth/me', (req, res) => {
 
 app.get('/api/products', async (req, res) => {
   try {
+    const { sort, min_price, max_price } = req.query;
+    const hasFilters = sort || min_price || max_price;
+
     const now = Date.now();
-    if (catalogCache.data && now - catalogCache.timestamp < catalogCache.ttl) {
+    if (!hasFilters && catalogCache.data && now - catalogCache.timestamp < catalogCache.ttl) {
       return res.json({ products: catalogCache.data, cached: true });
     }
+
+    const SORT_MAP = {
+      price_asc:  'p.price ASC',
+      price_desc: 'p.price DESC',
+      name_asc:   'p.name ASC',
+      name_desc:  'p.name DESC',
+    };
+    const orderBy = SORT_MAP[sort] || 'p.id DESC';
+
+    const params = [];
+    const where = [];
+    if (min_price) { where.push('p.price >= ?'); params.push(Number(min_price)); }
+    if (max_price) { where.push('p.price <= ?'); params.push(Number(max_price)); }
+    const whereClause = where.length ? `WHERE ${where.join(' AND ')}` : '';
 
     const products = await dbAll(`
       SELECT p.*, 
@@ -193,21 +210,17 @@ app.get('/api/products', async (req, res) => {
         COUNT(r.id) AS reviews_count
       FROM products p
       LEFT JOIN reviews r ON p.id = r.product_id
+      ${whereClause}
       GROUP BY p.id
-      ORDER BY p.id DESC
-    `);
+      ORDER BY ${orderBy}
+    `, params);
 
     const formatted = products.map(p => {
       const imgs = parseImages(p.image);
-      return {
-        ...p,
-        images: imgs,
-        image: imgs[0] || ''
-      };
+      return { ...p, images: imgs, image: imgs[0] || '' };
     });
 
-    catalogCache.data = formatted;
-    catalogCache.timestamp = now;
+    if (!hasFilters) { catalogCache.data = formatted; catalogCache.timestamp = now; }
     res.json({ products: formatted, cached: false });
   } catch (err) {
     console.error(err);
