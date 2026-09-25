@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>P.I.D.L. Logo Interactive Demo // Project invincible: Dark Legion</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #060709 url('viperr_opium_background.jpg') center center / cover no-repeat fixed;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      overflow-x: hidden;
+    }
+
+    
+    .site-header {
+      width: 100%;
+      max-width: 1280px;
+      padding: 24px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0) 100%);
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .brand-title {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: #fff;
+    }
+
+    .brand-sub {
+      font-size: 10px;
+      color: #8a929e;
+      letter-spacing: 2px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 28px;
+      font-size: 12px;
+      letter-spacing: 2px;
+    }
+
+    .nav-links a {
+      color: #a8b0bd;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: #fff;
+    }
+
+    
+    .stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      text-align: center;
+    }
+
+    .logo-container {
+      position: relative;
+      width: 285px;
+      height: 298px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+
+    
+    .dl-svg-logo {
+      width: 100%;
+      height: 100%;
+      display: block;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    
+    .glow-white .dl-interactive {
+      filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.95)) drop-shadow(0 0 25px rgba(200, 220, 255, 0.6));
+    }
+
+    .glow-red .dl-interactive {
+      filter: drop-shadow(0 0 12px rgba(255, 30, 60, 0.95)) drop-shadow(0 0 28px rgba(180, 0, 30, 0.7));
+    }
+
+    .glow-cyan .dl-interactive {
+      filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.95)) drop-shadow(0 0 30px rgba(0, 150, 200, 0.6));
+    }
+
+    .glow-violet .dl-interactive {
+      filter: drop-shadow(0 0 12px rgba(180, 50, 255, 0.95)) drop-shadow(0 0 30px rgba(120, 20, 200, 0.6));
+    }
+
+    
+    .show-hitbox .dl-hitbox {
+      fill: rgba(255, 0, 50, 0.3) !important;
+      stroke: #ff2255 !important;
+      stroke-width: 2px !important;
+    }
+
+    
+    .controls {
+      background: rgba(12, 14, 18, 0.8);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      padding: 16px 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: center;
+      max-width: 600px;
+      margin-bottom: 20px;
+    }
+
+    .controls span {
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      color: #8f9aa8;
+      text-transform: uppercase;
+      margin-right: 8px;
+    }
+
+    .btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #fff;
+      padding: 8px 14px;
+      font-size: 11px;
+      letter-spacing: 1px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn:hover,
+    .btn.active {
+      background: #fff;
+      color: #000;
+      border-color: #fff;
+    }
+
+    
+    .code-card {
+      background: rgba(8, 10, 14, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 6px;
+      padding: 16px 20px;
+      max-width: 640px;
+      width: 100%;
+      text-align: left;
+      font-size: 12px;
+      color: #abb3bf;
+      line-height: 1.6;
+      margin-bottom: 40px;
+    }
+
+    .code-card pre {
+      overflow-x: auto;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 10px;
+      border-radius: 4px;
+      color: #e2e8f0;
+      font-family: monospace;
+    }
+  </style>
+</head>
+
+<body>
+
+  
+  <header class="site-header">
+    <a href="#" class="brand-wrap">
+      
+      <img src="dl_logo_final_transparent.png" style="height: 44px; filter: drop-shadow(0 0 8px rgba(255,255,255,0.4));"
+        alt="DL" />
+      <div>
+        <div class="brand-title">P.I.D.L.</div>
+        <div class="brand-sub">PROJECT invincible : DARK LEGION</div>
+      </div>
+    </a>
+    <nav class="nav-links">
+      <a href="#">ARCHIVE</a>
+      <a href="#">DROPS</a>
+      <a href="#">LOOKBOOK</a>
+      <a href="#" style="color:#fff;">CART [0]</a>
+    </nav>
+  </header>
+
+  
+  <main class="stage">
+    <div class="logo-container" id="logoContainer">
+      
+      <object id="dlSvgObj" data="dl_logo_interactive.svg" type="image/svg+xml" class="dl-svg-logo"></object>
+    </div>
+
+    
+    <div class="controls">
+      <span>Глоу-эффект:</span>
+      <button class="btn active" onclick="setGlow('white')">White Aura</button>
+      <button class="btn" onclick="setGlow('red')">Vampire Red</button>
+      <button class="btn" onclick="setGlow('cyan')">Cyber Cyan</button>
+      <button class="btn" onclick="setGlow('violet')">Dark Violet</button>
+      <button class="btn" onclick="toggleHitbox()" style="border-color:#ff4466; color:#ff88aa;">Показать
+        хитбокс</button>
+    </div>
+
+    
+    <div class="code-card">
+      <div style="font-weight: 700; color: #fff; margin-bottom: 8px;">
+        ⚡ Как подключить на сайт с точной коллизией и обтекающим Glow:
+      </div>
+      <div>
+        1. <b>Без фона:</b> файл <code>dl_logo_final_transparent.png</code> (чистая альфа).<br />
+        2. <b>Глоу строго по буквам:</b> используется CSS <code>filter: drop-shadow(...)</code>, а <i>не</i>
+        <code>box-shadow</code>!<br />
+        3. <b>Хитбокс строго по шипам:</b> подключается через <code>clip-path: polygon(...)</code> или файл
+        <code>dl_logo_interactive.svg</code>:
+      </div>
+      <pre><code>
+.logo-btn {
+  
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
+  transition: filter 0.3s ease, transform 0.2s ease;
+}
+
+.logo-btn:hover {
+  
+  filter: drop-shadow(0 0 20px #ffffff) drop-shadow(0 0 35px #a0c4ff);
+  transform: scale(1.05);
+}</code></pre>
+    </div>
+  </main>
+
+  <script>
+    function setGlow(color) {
+      const container = document.getElementById('logoContainer');
+      container.className = 'logo-container glow-' + color;
+      document.querySelectorAll('.controls .btn').forEach(b => {
+        if (!b.innerText.includes('Показать')) b.classList.remove('active');
+      });
+      event.target.classList.add('active');
+    }
+
+    function toggleHitbox() {
+      const svgObj = document.getElementById('dlSvgObj');
+      try {
+        const svgDoc = svgObj.contentDocument;
+        if (svgDoc) {
+          const poly = svgDoc.querySelector('.dl-hitbox');
+          if (poly.getAttribute('fill') === 'rgba(255, 0, 80, 0.4)') {
+            poly.setAttribute('fill', 'transparent');
+            poly.removeAttribute('stroke');
+          } else {
+            poly.setAttribute('fill', 'rgba(255, 0, 80, 0.4)');
+            poly.setAttribute('stroke', '#ff0055');
+            poly.setAttribute('stroke-width', '2');
+          }
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    }
+  </script>
+</body>
+
+</html>

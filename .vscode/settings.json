@@ -1,0 +1,7 @@
+{
+  "python.defaultInterpreterPath": "C:\\Users\\Dante1\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+  "python.analysis.extraPaths": [
+    "C:/Users/Dante1/AppData/Local/Python/pythoncore-3.14-64/Lib/site-packages",
+    "C:/Users/Dante1/AppData/Local/Programs/Python/Python314/Lib/site-packages"
+  ]
+}

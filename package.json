@@ -1,5 +1,5 @@
 {
-  "name": "pidl-archive",
+  "name": "pidl",
   "version": "1.0.0",
   "description": "PI:DL // POST-INDUSTRIAL : DARK LABELS",
   "main": "server.js",
@@ -16,6 +16,8 @@
     "express-session": "^1.19.0",
     "express-validator": "^7.3.2",
     "multer": "^2.4.0",
+    "node-telegram-bot-api": "^0.64.0",
+    "socks-proxy-agent": "^10.1.0",
     "sqlite3": "^6.0.1"
   }
 }

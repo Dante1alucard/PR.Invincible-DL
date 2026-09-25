@@ -1,54 +1,65 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>PI:DL // POST-INDUSTRIAL : DARK LABELS</title>
-  <meta name="description" content="PI:DL — Архивный деконструктивизм, distressed одежда и андеграундный крой">
+  <title>Project invincible: Dark Legion // P.I.D.L.</title>
+  <meta name="description"
+    content="Project invincible: Dark Legion — Деконструктивизм, distressed одежда и андеграундный крой">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Inter:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Inter:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@700;800&display=swap"
+    rel="stylesheet">
+  <base href="/">
+  <link rel="stylesheet" href="/style.css?v=18">
 </head>
-<body>
 
-  <!-- Side rail decorative guide lines (готовые поля под твои краевые декоры) -->
-  <div class="side-rail side-rail-left" aria-hidden="true">
-    <div class="rail-text">PI:DL // SPECIMEN ARCHIVE // 2026</div>
-  </div>
-  <div class="side-rail side-rail-right" aria-hidden="true">
-    <div class="rail-text">DISTRESSED DECONSTRUCT // NO RULES</div>
-  </div>
+<body>
 
   <header class="navbar">
     <div class="nav-container">
-      <div class="brand" onclick="navigateTo('catalog')">
-        <span class="brand-code">[ PI:DL ]</span>
+      <div class="brand" onclick="navigateTo('catalog')" title="Project invincible: Dark Legion">
+        <div class="brand-logo-stage">
+          <svg class="dl-brand-svg" viewBox="0 0 285 298" xmlns="http://www.w3.org/2000/svg"
+            aria-label="Dark Legion Logo">
+            <defs>
+              <filter id="dl-spikes-glow" x="-50%" y="-50%" width="200%" height="200%">
+                <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#ffffff" flood-opacity="0.95" />
+                <feDropShadow dx="0" dy="0" stdDeviation="15" flood-color="#b0c8ff" flood-opacity="0.65" />
+              </filter>
+            </defs>
+            <g class="dl-interactive-group">
+              <image href="/assets/logo/dl_logo_final_transparent.png" x="0" y="0" width="285" height="298" class="dl-brand-img" />
+              <polygon
+                points="236,149 234,157 229,164 225,171 219,177 283,214 274,225 265,235 255,244 245,252 236,260 227,270 218,280 208,290 184,263 173,262 162,261 152,262 142,263 132,262 122,263 111,264 99,267 85,270 68,277 98,211 89,211 80,211 67,211 52,212 28,215 15,208 44,184 51,173 55,164 58,156 62,149 34,139 47,132 59,126 67,121 75,117 80,113 83,107 9,37 30,37 49,38 64,37 78,38 90,38 102,38 112,38 123,38 132,35 142,29 153,19 161,38 171,40 181,41 193,40 214,24 245,1 211,66 223,68 229,75 234,84 237,94 240,103 245,111 256,118 274,125 240,140"
+                class="dl-brand-hitbox" />
+            </g>
+          </svg>
+        </div>
         <div class="brand-meta">
-          <span class="brand-title">POST-INDUSTRIAL</span>
-          <span class="brand-sub">DARK LABELS // ARCHIVE</span>
+          <div class="brand-title">P.I.D.L.</div>
+          <div class="brand-sub">PROJECT invincible: DARK LEGION</div>
         </div>
       </div>
 
       <nav class="nav-links">
-        <button class="nav-btn active" id="navCatalogBtn" onclick="navigateTo('catalog')">Каталог</button>
+        <button class="nav-btn active" id="navCatalogBtn" onclick="navigateTo('catalog')">ARCHIVE</button>
+        <button class="nav-btn" id="navDropsBtn" onclick="scrollToDrops()">DROPS</button>
         <button class="nav-btn" id="navWishlistBtn" onclick="navigateTo('wishlist')">
-          Избранное <span class="badge" id="wishlistBadge">0</span>
+          WISHLIST [<span id="wishlistBadge">0</span>]
         </button>
         <button class="nav-btn" id="navProfileBtn" onclick="openProfileOrAuth()">
-          <span id="navProfileText">Войти</span>
+          <span id="navProfileText">LOGIN</span>
         </button>
         <button class="nav-btn admin-link" id="navAdminBtn" onclick="navigateTo('admin')" style="display: none;">
-          [ ROOT // ADMIN ]
+          GOD MODE
+        </button>
+        <button class="nav-btn cart-trigger" id="cartTrigger" onclick="toggleCart()">
+          CART [<span id="cartBadge">0</span>]
         </button>
       </nav>
-
-      <div class="nav-actions">
-        <button class="cart-trigger" id="cartTrigger" onclick="openCart()">
-          <span class="cart-text">Корзина</span>
-          <span class="badge" id="cartBadge">0</span>
-        </button>
-      </div>
     </div>
   </header>
 
@@ -56,28 +67,32 @@
 
     <section id="catalogView" class="view-section active">
       <div class="hero-banner">
-        <div class="hero-meta">
-          <span class="meta-tag">[ SPECIMEN CATALOG ]</span>
-          <span class="meta-tag">BATCH 04 // DISTRESSED</span>
-          <span class="meta-tag">FALL-WINTER 2026</span>
+        <div class="hero-main-side">
+          <div class="hero-meta">
+            <span class="meta-tag">PROJECT invincible : </span>
+          </div>
+          <h1 class="hero-heading" style="background-image: linear-gradient(to right, #28005c, #ff08ff, #00ffea);
+          -webkit-background-clip: text;
+          background-clip: text;
+          -webkit-text-fill-color: transparent;">DARK</h1> <h1 class="hero-heading" style="background-image: linear-gradient(to right, #cbd5ff, #ff0eff, #ff2600);
+          -webkit-background-clip: text;
+          background-clip: text;
+          -webkit-text-fill-color: transparent;
+    color: transparent;" >LEGION</h1>
+          <p class="hero-desc">Project invincible: Dark Legion — Деконструктивизм, тяжелый хлопок, distressed текстуры,
+            вощеный деним и сырые необработанные швы. Одежда для тех, кто отвергает масс-маркет.</p>
         </div>
-        <h1 class="hero-heading">PI:DL ARCHIVE</h1>
-        <p class="hero-desc">Деконструктивизм, тяжелый хлопок, distressed текстуры, вощеный деним и сырые необработанные швы. Одежда для тех, кто отвергает масс-маркет.</p>
-        <div class="promo-strip">
-          <span class="promo-item">DROP-10: <button type="button" class="code-pill" onclick="copyCode('OPIUM10')">OPIUM10</button></span>
-          <span class="promo-item">DROP-15: <button type="button" class="code-pill" onclick="copyCode('KAIANGEL')">KAIANGEL</button></span>
-          <span class="promo-item">DROP-20: <button type="button" class="code-pill" onclick="copyCode('VIPER20')">VIPER20</button></span>
-        </div>
+        <div class="hero-spotlight-card" id="heroSpotlightCard" style="display: none;"></div>
       </div>
 
       <div class="category-bar">
         <button class="cat-chip active" onclick="filterCategory('Все')">Все</button>
-        <button class="cat-chip" onclick="filterCategory('Худи')">Худи</button>
-        <button class="cat-chip" onclick="filterCategory('Свитеры')">Трикотаж</button>
-        <button class="cat-chip" onclick="filterCategory('Штаны')">Штаны</button>
-        <button class="cat-chip" onclick="filterCategory('Куртки')">Верхняя одежда</button>
+        <button class="cat-chip" onclick="filterCategory('Худи+zip')">Худи+zip</button>
+        <button class="cat-chip" onclick="filterCategory('Лонгсливы')">Лонгсливы</button>
+        <button class="cat-chip" onclick="filterCategory('Футболки')">Футболки</button>
         <button class="cat-chip" onclick="filterCategory('Обувь')">Обувь</button>
-        <button class="cat-chip" onclick="filterCategory('Аксессуары')">Аксессуары</button>
+        <button class="cat-chip" onclick="filterCategory('Как у каенжила')">Как у каенжила</button>
+        <button class="cat-chip" onclick="filterCategory('Как у madk1d`a')">Как у madk1d`a</button>
       </div>
 
       <div class="products-grid" id="productsGrid"></div>
@@ -89,6 +104,26 @@
         <p class="section-subtitle">Сохраненные позиции каталога</p>
       </div>
       <div class="products-grid" id="wishlistGrid"></div>
+    </section>
+
+    
+    <section id="productView" class="view-section">
+      <div class="product-page-top">
+        <button class="btn btn-secondary btn-sm back-catalog-btn" onclick="navigateTo('catalog')">
+          ← Назад в каталог
+        </button>
+        <div class="product-breadcrumbs" id="productBreadcrumbs">
+          <span class="crumb-link" onclick="navigateTo('catalog')">Каталог</span>
+          <span class="crumb-sep">/</span>
+          <span id="breadcrumbCategory" class="crumb-link">-</span>
+          <span class="crumb-sep">/</span>
+          <span id="breadcrumbTitle" class="crumb-current">-</span>
+        </div>
+      </div>
+
+      <div class="product-page-layout" id="productPageContent">
+        
+      </div>
     </section>
 
     <section id="profileView" class="view-section">
@@ -124,27 +159,57 @@
       </div>
 
       <div class="admin-tabs">
-        <button class="admin-tab-btn active" id="tabOrdersBtn" onclick="switchAdminTab('orders')">Заказы</button>
-        <button class="admin-tab-btn" id="tabAddProductBtn" onclick="switchAdminTab('add-product')">Добавить товар</button>
+        <button class="admin-tab-btn active" id="tabCatalogBtn" onclick="switchAdminTab('catalog-mgmt')">Каталог
+          товаров</button>
+        <button class="admin-tab-btn" id="tabOrdersBtn" onclick="switchAdminTab('orders')">Заказы</button>
+        <button class="admin-tab-btn" id="tabAddProductBtn" onclick="switchAdminTab('add-product')">+ Добавить
+          товар</button>
       </div>
 
-      <div id="adminOrdersSubView" class="admin-subview active">
+      <div id="adminCatalogSubView" class="admin-subview active">
+        <div class="admin-filter-bar" style="gap: 12px; align-items: flex-end; flex-wrap: wrap;">
+          <div class="filter-group" style="flex: 2; min-width: 220px;">
+            <label>Поиск по названию:</label>
+            <input type="text" id="adminProductSearch" placeholder="Введите название товара..."
+              oninput="renderAdminProductsList()">
+          </div>
+          <div class="filter-group" style="flex: 1; min-width: 180px;">
+            <label>Категория:</label>
+            <select id="adminProductCategoryFilter" onchange="renderAdminProductsList()">
+              <option value="Все">Все категории</option>
+              <option value="Худи+zip">Худи+zip</option>
+              <option value="Лонгсливы">Лонгсливы</option>
+              <option value="Футболки">Футболки</option>
+              <option value="Обувь">Обувь</option>
+              <option value="Как у каенжила">Как у каенжила</option>
+              <option value="Как у madk1d`a">Как у madk1d`a</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="switchAdminTab('add-product')" style="white-space: nowrap;">+
+            Добавить новый товар</button>
+        </div>
+
+        <div id="adminProductsCount" style="margin: 14px 0 10px; font-size: 19px; color: var(--text-muted);"></div>
+        <div id="adminProductsList" class="admin-products-grid"></div>
+      </div>
+
+      <div id="adminOrdersSubView" class="admin-subview">
         <div class="admin-filter-bar">
           <div class="filter-group">
             <label>Статус:</label>
             <select id="adminStatusFilter" onchange="loadAdminOrders()">
               <option value="Все">Все</option>
-              <option value="Новый">Новый</option>
-              <option value="В обработке">В обработке</option>
-              <option value="Завершено">Завершено</option>
+              <option value="ПРИНЯТ">ПРИНЯТ...</option>
+              <option value="ОЖИДАЙТЕ">ОЖИДАЙТЕ..</option>
+              <option value="ПОЛУЧЕН">ПОЛУЧЕН...</option>
             </select>
           </div>
 
           <div class="batch-group">
             <select id="adminBatchStatus">
-              <option value="В обработке">В обработке</option>
-              <option value="Завершено">Завершено</option>
-              <option value="Новый">Новый</option>
+              <option value="принят">ПРИНЯТ...</option>
+              <option value="ожидайте">ОЖИДАЙТЕ..</option>
+              <option value="получен">ПОЛУЧЕН...</option>
             </select>
             <button class="btn btn-secondary" onclick="applyBatchStatus()">Применить к выбранным</button>
           </div>
@@ -163,16 +228,24 @@
             </div>
             <div class="form-row">
               <div class="form-group">
-                <label>Категория</label>
+                <label>Основная категория</label>
                 <select name="category" id="prodCategory">
-                  <option value="Худи">Худи</option>
-                  <option value="Свитеры">Свитеры</option>
-                  <option value="Штаны">Штаны</option>
-                  <option value="Куртки">Куртки</option>
+                  <option value="Худи+zip">Худи+zip</option>
+                  <option value="Лонгсливы">Лонгсливы</option>
+                  <option value="Футболки">Футболки</option>
                   <option value="Обувь">Обувь</option>
-                  <option value="Аксессуары">Аксессуары</option>
                 </select>
               </div>
+              <div class="form-group">
+                <label>Доп. категория (стиль / коллаб)</label>
+                <select name="extra_category" id="prodExtraCategory">
+                  <option value="">Без доп. категории</option>
+                  <option value="Как у каенжила">Как у каенжила</option>
+                  <option value="Как у madk1d`a">Как у madk1d`a</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
               <div class="form-group">
                 <label>Цена (₽)</label>
                 <input type="number" name="price" id="prodPrice" min="1" required>
@@ -187,9 +260,26 @@
               <textarea name="description" id="prodDesc" rows="3"></textarea>
             </div>
             <div class="form-group">
-              <label>Изображение (Multer)</label>
-              <input type="file" name="image" id="prodImage" accept="image/*">
-              <p class="field-hint">Если файл не выбран, используется no_image.jpg</p>
+              <div class="photo-upload-header">
+                <label>Фотографии товара (до 5 шт.)</label>
+                <span class="photo-counter" id="photoCounter">0 / 5</span>
+              </div>
+              <div class="photo-uploader-box" id="photoUploaderBox">
+                <div class="photo-drop-hint" id="photoDropHint">
+                  <span class="drop-icon">📁</span>
+                  <span class="drop-text">Перетащите сюда фото или нажмите «+ Добавить фото» (из любых папок, до 5
+                    шт.)</span>
+                </div>
+                <div class="photo-previews-list" id="photoPreviewsList"></div>
+                <button type="button" class="photo-add-card" id="photoAddCard" onclick="triggerPhotoSelect()">
+                  <span class="plus-icon">+</span>
+                  <span class="add-text">Добавить фото</span>
+                </button>
+                <input type="file" id="singlePhotoInput" accept="image/*" multiple style="display: none;"
+                  onchange="handleSinglePhotoAdd(event)">
+              </div>
+              <p class="field-hint">Загружайте фото по одному или пачками из любых папок. Первое фото станет обложкой.
+                Можно менять обложку кликом по звездочке ★.</p>
             </div>
             <button type="submit" class="btn btn-primary full-width">Сохранить товар</button>
           </form>
@@ -206,7 +296,83 @@
     </div>
   </div>
 
-  <div class="drawer-overlay" id="cartDrawer">
+  <div class="modal-overlay" id="editProductModal">
+    <div class="modal-box modal-lg">
+      <button class="modal-close" onclick="closeEditProductModal()">✕</button>
+      <div class="form-card" style="border: none; padding: 0; background: transparent;">
+        <h3 class="form-title" style="margin-bottom: 20px;">Редактирование товара <span id="editProductHeadingId"
+            style="color: var(--primary-accent);"></span></h3>
+        <form id="editProductForm" onsubmit="submitEditProduct(event)">
+          <input type="hidden" name="id" id="editProdId">
+          <div class="form-group">
+            <label>Название товара</label>
+            <input type="text" name="title" id="editProdTitle" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Основная категория</label>
+              <select name="category" id="editProdCategory">
+                <option value="Худи+zip">Худи+zip</option>
+                <option value="Лонгсливы">Лонгсливы</option>
+                <option value="Футболки">Футболки</option>
+                <option value="Обувь">Обувь</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Доп. категория (стиль / коллаб)</label>
+              <select name="extra_category" id="editProdExtraCategory">
+                <option value="">Без доп. категории</option>
+                <option value="Как у каенжила">Как у каенжила</option>
+                <option value="Как у madk1d`a">Как у madk1d`a</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Цена (₽)</label>
+              <input type="number" name="price" id="editProdPrice" min="1" required>
+            </div>
+            <div class="form-group">
+              <label>Остаток на складе (шт.)</label>
+              <input type="number" name="stock" id="editProdStock" min="0" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Описание</label>
+            <textarea name="description" id="editProdDesc" rows="4"></textarea>
+          </div>
+          <div class="form-group">
+            <div class="photo-upload-header">
+              <label>Фотографии товара (до 5 шт.)</label>
+              <span class="photo-counter" id="editPhotoCounter">0 / 5</span>
+            </div>
+            <div class="photo-uploader-box" id="editPhotoUploaderBox">
+              <div class="photo-drop-hint" id="editPhotoDropHint">
+                <span class="drop-icon">📁</span>
+                <span class="drop-text">Нажмите «+ Добавить фото» для загрузки новых снимков</span>
+              </div>
+              <div class="photo-previews-list" id="editPhotoPreviewsList"></div>
+              <button type="button" class="photo-add-card" id="editPhotoAddCard" onclick="triggerEditPhotoSelect()">
+                <span class="plus-icon">+</span>
+                <span class="add-text">Добавить фото</span>
+              </button>
+              <input type="file" id="editSinglePhotoInput" accept="image/*" multiple style="display: none;"
+                onchange="handleEditPhotoAdd(event)">
+            </div>
+            <p class="field-hint">Кликните ✕ на миниатюре чтобы удалить фото. Первая фотография в списке — главная
+              обложка.</p>
+          </div>
+          <div style="display: flex; gap: 14px; margin-top: 24px;">
+            <button type="submit" class="btn btn-primary" style="flex: 2; height: 50px;">Сохранить изменения</button>
+            <button type="button" class="btn btn-secondary" onclick="closeEditProductModal()"
+              style="flex: 1; height: 50px;">Отмена</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="drawer-overlay" id="cartDrawer" onclick="if(event.target === this) closeCart()">
     <div class="drawer-content">
       <div class="drawer-header">
         <h3 class="drawer-title">Корзина</h3>
@@ -245,7 +411,7 @@
     </div>
   </div>
 
-  <div class="modal-overlay" id="checkoutModal">
+  <div class="modal-overlay" id="checkoutModal" onclick="if(event.target === this) closeCheckout()">
     <div class="modal-box">
       <button class="modal-close" onclick="closeCheckout()">✕</button>
       <h3 class="modal-title">Оформление заказа</h3>
@@ -256,30 +422,48 @@
           <label>ФИО</label>
           <input type="text" id="orderName" required>
         </div>
-        <div class="form-group">
+        <div class="form-group" id="phoneFieldGroup">
           <label>Телефон</label>
-          <input type="text" id="orderPhone" required>
+          <input type="text" id="orderPhone" required placeholder="8(XXX)XXX-XX-XX">
+        </div>
+        <div class="form-group" id="tgFieldGroup" style="display: none;">
+          <label>Telegram Username (для отправки координат клада)</label>
+          <input type="text" id="orderTgUsername" placeholder="@username">
+          <small style="color: var(--primary-accent); margin-top: 5px; display: block; font-size: 11px; line-height: 1.4;">
+            🖤 Бот мгновенно отправит точные координаты и ориентир тайника на указанный @username.
+          </small>
         </div>
 
         <div class="form-group">
           <label>Способ доставки</label>
-          <select id="orderDeliveryMethod" required>
+          <select id="orderDeliveryMethod" required onchange="onDeliveryMethodChange()">
             <option value="Курьер CDEK">Курьер CDEK</option>
             <option value="Пункт выдачи Boxberry">Пункт выдачи Boxberry</option>
             <option value="Постамат Х5">Постамат Х5</option>
-            <option value="Самовывоз">Самовывоз (Шоурум)</option>
+            <option value="Клад">Клад (ТОЛЬКО МСК)</option>
           </select>
         </div>
 
+        <div class="form-group" id="kladTypeGroup" style="display: none;">
+          <label>Тип доставки кладом</label>
+          <select id="orderKladType" onchange="onKladTypeChange()">
+            <option value="обычная">1. обычная</option>
+            <option value="EXTRIMM">2. EXTRIMM</option>
+          </select>
+          <small id="kladTypeHint" style="color: var(--text-dim); margin-top: 5px; display: block; font-size: 11px; line-height: 1.4;">
+            ✦ Обычная: спокойный тайник в черте города Москвы.
+          </small>
+        </div>
+
         <div class="form-group">
-          <label>Желаемая дата доставки</label>
+          <label id="orderDeliveryDateLabel">Желаемая дата доставки</label>
           <input type="date" id="orderDeliveryDate" required>
         </div>
 
         <div class="form-group">
           <label>Способ оплаты</label>
           <select id="orderPaymentMethod" required>
-            <option value="При получении">При получении</option>
+            <option value="При получении" id="payOptionCash">При получении</option>
             <option value="СБП">СБП</option>
           </select>
         </div>
@@ -293,6 +477,33 @@
           Оформить заказ
         </button>
       </form>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="kladModal" onclick="if(event.target === this) closeKladModal()">
+    <div class="modal-box" style="border: 1px solid var(--primary-accent); box-shadow: 0 0 40px rgba(255, 42, 109, 0.3); max-width: 480px;">
+      <button class="modal-close" onclick="closeKladModal()">✕</button>
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+        <span style="font-size: 24px;">🖤</span>
+        <h3 class="modal-title" style="margin: 0; color: #fff; letter-spacing: 2px;">ДИСПЕТЧЕР P.I.D.L.</h3>
+      </div>
+      <p class="modal-subtitle" style="color: var(--primary-accent); font-weight: 700; text-transform: uppercase; font-size: 13px;">
+        ЗАКАЗ #<span id="kladOrderId"></span> // ДОСТАВКА «КЛАД»
+      </p>
+
+      <div style="background: rgba(8, 10, 15, 0.95); border: 1px dashed rgba(255, 255, 255, 0.2); border-radius: 8px; padding: 18px; margin: 18px 0;">
+        <div id="kladStatusLine" style="font-size: 13px; line-height: 1.6; color: #e2e8f0;"></div>
+        
+        <div id="kladTgActionWrap" style="text-align: center; margin-top: 16px;">
+          <a id="kladTgBtn" href="#" target="_blank" class="btn btn-primary full-width" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; font-size: 14px; padding: 12px;">
+            <span>⚡</span> <span id="kladTgBtnText">ОТКРЫТЬ TELEGRAM БОТА</span>
+          </a>
+        </div>
+      </div>
+
+      <div style="text-align: center; margin-top: 20px;">
+        <button class="btn btn-secondary btn-sm" onclick="closeKladModal()" style="min-width: 140px;">Закрыть</button>
+      </div>
     </div>
   </div>
 
@@ -326,8 +537,9 @@
           </div>
 
           <div class="quick-admin-box">
-            <button type="button" class="btn btn-secondary btn-sm full-width" onclick="quickFillAdmin()">Заполнить lab16 / prac3</button>
+            <button type="button" class="btn btn-secondary btn-sm full-width" onclick="quickFillAdmin()">fast GodMode</button>
           </div>
+          
         </form>
       </div>
 
@@ -381,11 +593,12 @@
 
   <footer class="footer">
     <div class="footer-content">
-      <div class="footer-logo">PI:DL // POST-INDUSTRIAL : DARK LABELS</div>
-      <p class="footer-sub">ARCHIVE DIVISION // NON-CONFORMIST CLOTHING SPECIMENS // 2026</p>
+      <div class="footer-logo">P.I.D.L. // PROJECT invincible: DARK LEGION</div>
+      <p class="footer-sub">NON-CONFORMIST CLOTHING SPECIMENS // 2026</p>
     </div>
   </footer>
 
-  <script src="app.js"></script>
+  <script src="/app.js?v=19"></script>
 </body>
+
 </html>

@@ -52,9 +52,15 @@ async function initDatabase() {
       price REAL NOT NULL,
       stock INTEGER NOT NULL,
       image TEXT,
-      category TEXT
+      category TEXT,
+      extra_category TEXT
     )
   `);
+
+  try {
+    await dbRun('ALTER TABLE products ADD COLUMN extra_category TEXT');
+  } catch (err) {
+  }
 
   await dbRun(`
     CREATE TABLE IF NOT EXISTS orders (
@@ -117,67 +123,6 @@ async function initDatabase() {
       INSERT INTO users (login, password, full_name, phone, email, role)
       VALUES (?, ?, ?, ?, ?, ?)
     `, ['lab16', 'prac3', 'Администратор', '8(999)000-00-00', 'admin@store.local', 'admin']);
-  }
-
-  const countRow = await dbGet('SELECT COUNT(*) as count FROM products');
-  if (countRow.count === 0) {
-    const seedProducts = [
-      {
-        title: "Archive Heavy Distressed Hoodie 'VIPER'",
-        description: 'Оверсайз худи с эффектом состаривания, вываркой швов и металлической фурнитурой.',
-        price: 8900,
-        stock: 15,
-        image: '',
-        category: 'Худи'
-      },
-      {
-        title: 'Opium Cobweb Distressed Knit',
-        description: 'Черный рваный джемпер фактурного плетения в темной минималистичной стилистике.',
-        price: 7400,
-        stock: 8,
-        image: '',
-        category: 'Свитеры'
-      },
-      {
-        title: 'Waxed Mud-Wash Flared Cargo Pants',
-        description: 'Архивные вощеные штаны клеш со сложным кроем коленей и карманами.',
-        price: 11900,
-        stock: 12,
-        image: '',
-        category: 'Штаны'
-      },
-      {
-        title: 'Cyber-Goth Asymmetric Leather Jacket',
-        description: 'Куртка из плотной кожи с асимметричной металлической молнией и воротником-стойкой.',
-        price: 24900,
-        stock: 5,
-        image: '',
-        category: 'Куртки'
-      },
-      {
-        title: 'Steel-Spiked Balaclava Beanie',
-        description: 'Трансформируемая балаклава из плотного риба с металлическими акцентами.',
-        price: 3200,
-        stock: 20,
-        image: '',
-        category: 'Аксессуары'
-      },
-      {
-        title: 'Platform Brutal Armor Boots',
-        description: 'Массивные кожаные ботинки на высокой подошве со стальной защитной вставкой.',
-        price: 17500,
-        stock: 7,
-        image: '',
-        category: 'Обувь'
-      }
-    ];
-
-    for (const p of seedProducts) {
-      await dbRun(
-        'INSERT INTO products (title, description, price, stock, image, category) VALUES (?, ?, ?, ?, ?, ?)',
-        [p.title, p.description, p.price, p.stock, p.image, p.category]
-      );
-    }
   }
 }
 

@@ -60,7 +60,7 @@ async function runTests() {
   await request({
     host: 'localhost', port: 3000, path: '/api/promo/apply', method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Cookie': cookie }
-  }, { code: 'VIPER20' });
+  }, { code: 'VIPERR20' });
 
   const cartRes = await request({
     host: 'localhost', port: 3000, path: '/api/cart', method: 'GET',
